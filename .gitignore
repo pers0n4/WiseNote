@@ -16,5 +16,6 @@ local.properties
 
 .project
 .classpath
+.settings/
 
 cs
