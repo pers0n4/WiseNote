@@ -13,27 +13,27 @@ repos:
       - id: trailing-whitespace
         args: [--markdown-linebreak-ext=md]
 
-#   - repo: https://github.com/dustinsand/pre-commit-jvm
-#     rev: v0.4.0
-#     hooks:
-#       - id: google-java-formatter-jdk11
-#         args: [--replace, --set-exit-if-changed]
-#       - id: ktlint
-#         args: [--format]
+  # - repo: https://github.com/dustinsand/pre-commit-jvm
+  #   rev: v0.4.0
+  #   hooks:
+  #     - id: google-java-formatter-jdk11
+  #       args: [--replace, --set-exit-if-changed]
+  #     - id: ktlint
+  #       args: [--format]
 
-#   - repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
-#     rev: v2.1.0
-#     hooks:
-#       - id: pretty-format-java
-#         args: [--autofix]
-#       - id: pretty-format-kotlin
-#         args: [--autofix]
+  # - repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
+  #   rev: v2.1.0
+  #   hooks:
+  #     - id: pretty-format-java
+  #       args: [--autofix]
+  #     - id: pretty-format-kotlin
+  #       args: [--autofix]
 
   - repo: https://github.com/pycqa/isort
     rev: 5.9.3
     hooks:
       - id: isort
-        args: ["--profile", "black", "--filter-files"]
+        args: [--profile, black, --filter-files]
 
   - repo: https://github.com/psf/black
     rev: 21.9b0
