@@ -1,0 +1,46 @@
+[tool.poetry]
+name = "wisenote-server"
+version = "0.1.0"
+description = ""
+authors = ["Dong-Young Kim <31337.persona@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+fastapi = "^0.68.1"
+uvicorn = { extras = ["standard"], version = "^0.15.0" }
+pydantic = "^1.8.2"
+SQLAlchemy = { extras = ["mypy"], version = "^1.4.25" }
+python-jose = { extras = ["cryptography"], version = "^3.3.0" }
+passlib = { extras = ["bcrypt"], version = "^1.7.4" }
+
+[tool.poetry.dev-dependencies]
+mypy = "^0.910"
+black = "^21.9b0"
+isort = { extras = ["requirements_deprecated_finder"], version = "^5.9.3" }
+flake8 = "^3.9.2"
+pre-commit = "^2.15.0"
+
+[tool.black]
+target-version = ['py38']
+line-length = 88
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  | \.git
+  | \.mypy_cache
+)/
+'''
+
+[tool.isort]
+py_version = "38"
+profile = "black"
+
+[tool.mypy]
+python_version = "3.8"
+plugins = ["sqlalchemy.ext.mypy.plugin", "pydantic.mypy"]
+ignore_missing_imports = true
+disallow_untyped_defs = true
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
