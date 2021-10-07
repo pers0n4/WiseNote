@@ -8,7 +8,7 @@ authors = ["Dong-Young Kim <31337.persona@gmail.com>"]
 python = "^3.8"
 fastapi = "^0.68.1"
 uvicorn = { extras = ["standard"], version = "^0.15.0" }
-pydantic = "^1.8.2"
+pydantic = {extras = ["email"], version = "^1.8.2"}
 SQLAlchemy = { extras = ["mypy"], version = "^1.4.25" }
 python-jose = { extras = ["cryptography"], version = "^3.3.0" }
 passlib = { extras = ["bcrypt"], version = "^1.7.4" }
