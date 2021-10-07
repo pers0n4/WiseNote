@@ -19,6 +19,7 @@ black = "^21.9b0"
 isort = { extras = ["requirements_deprecated_finder"], version = "^5.9.3" }
 flake8 = "^3.9.2"
 pre-commit = "^2.15.0"
+bandit = "^1.7.0"
 
 [tool.black]
 target-version = ['py38']
