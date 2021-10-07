@@ -24,9 +24,9 @@ class Service(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         return object_model
 
     def find_all(
-        self, db: Session, *, offset: int = 0, limit: int = 100
+        self, db: Session, *, limit: int = 100, offset: int = 0
     ) -> List[ModelType]:
-        return db.query(self.model).offset(offset).limit(limit).all()
+        return db.query(self.model).limit(limit).offset(offset).all()
 
     def find_one(self, db: Session, id: Any) -> Optional[ModelType]:
         return db.query(self.model).filter(self.model.id == id).first()
