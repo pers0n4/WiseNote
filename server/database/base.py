@@ -12,7 +12,7 @@ else:
 
 
 # https://docs.sqlalchemy.org/en/14/core/custom_types.html#backend-agnostic-guid-type
-class GUID(UUIDTypeDecorator):
+class GUID(UUIDTypeDecorator):  # type: ignore
     """Platform-independent UUID type.
 
     Uses PostgreSQL's UUID type, otherwise uses
@@ -58,6 +58,6 @@ class Base:
     __name__: str
     id: Any
 
-    @declared_attr
-    def __tablename__(cls) -> str:
+    @declared_attr  # type: ignore
+    def __tablename__(cls):
         return cls.__name__.lower()

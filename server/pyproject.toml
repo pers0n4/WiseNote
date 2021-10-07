@@ -8,7 +8,7 @@ authors = ["Dong-Young Kim <31337.persona@gmail.com>"]
 python = "^3.8"
 fastapi = "^0.68.1"
 uvicorn = { extras = ["standard"], version = "^0.15.0" }
-pydantic = {extras = ["email"], version = "^1.8.2"}
+pydantic = { extras = ["email"], version = "^1.8.2" }
 SQLAlchemy = { extras = ["mypy"], version = "^1.4.25" }
 python-jose = { extras = ["cryptography"], version = "^3.3.0" }
 passlib = { extras = ["bcrypt"], version = "^1.7.4" }
@@ -22,15 +22,9 @@ pre-commit = "^2.15.0"
 bandit = "^1.7.0"
 
 [tool.black]
-target-version = ['py38']
 line-length = 88
+target-version = ['py38']
 include = '\.pyi?$'
-extend-exclude = '''
-/(
-  | \.git
-  | \.mypy_cache
-)/
-'''
 
 [tool.isort]
 py_version = "38"
@@ -38,8 +32,11 @@ profile = "black"
 
 [tool.mypy]
 python_version = "3.8"
-plugins = ["sqlalchemy.ext.mypy.plugin", "pydantic.mypy"]
-ignore_missing_imports = true
+plugins = ["pydantic.mypy", "sqlalchemy.ext.mypy.plugin"]
+show_error_codes = true
+show_error_context = true
+show_column_numbers = true
+pretty = true
 disallow_untyped_defs = true
 
 [build-system]
