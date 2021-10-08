@@ -1,5 +1,6 @@
 from .auth import Token, TokenPayload
-from .note import Note, NoteCreate, NoteUpdate
+from .note import Note, NoteCreate, NoteInDBBase, NoteUpdate
+from .notebook import Notebook, NotebookCreate, NotebookInDB, NotebookUpdate
 from .user import User, UserCreate, UserUpdate
 
 __all__ = [
@@ -11,4 +12,9 @@ __all__ = [
     "Note",
     "NoteCreate",
     "NoteUpdate",
+    "NoteInDBBase",
+    "Notebook",
+    "NotebookCreate",
+    "NotebookUpdate",
+    "NotebookInDB",
 ]
