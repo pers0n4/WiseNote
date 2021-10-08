@@ -13,4 +13,5 @@ class User(Base):
     name = Column(String, nullable=False)
     phone = Column(String(13), nullable=False)
 
+    notebooks: RelationshipProperty = relationship("Notebook", back_populates="user")
     notes: RelationshipProperty = relationship("Note", back_populates="user")
