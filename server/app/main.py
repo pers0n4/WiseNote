@@ -9,7 +9,7 @@ from database.session import engine
 
 Base.metadata.create_all(bind=engine)  # type: ignore
 
-app = FastAPI()
+app = FastAPI(title="WiseNote")
 
 
 @app.get("/", response_class=RedirectResponse)
