@@ -25,7 +25,6 @@ class UserUpdate(UserBase):
 class UserInDBBase(BaseModel):
     id: UUID
     email: EmailStr
-    password: str
     name: str
     phone: str
 
@@ -34,7 +33,7 @@ class UserInDBBase(BaseModel):
 
 
 class UserInDB(UserInDBBase):
-    pass
+    password: str
 
 
 class User(UserInDBBase):
