@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 
 from database.session import get_db
 
-from .. import schemas, services
+from .. import models, schemas, services
 
 router = APIRouter()
 
@@ -37,7 +37,11 @@ def read_user(*, db: Session = Depends(get_db), user_id: UUID) -> Any:
 
 @router.patch("/{user_id}", response_model=schemas.User, status_code=status.HTTP_200_OK)
 def update_user(
-    *, db: Session = Depends(get_db), user_id: UUID, user_in: schemas.UserUpdate
+    *,
+    db: Session = Depends(get_db),
+    user_id: UUID,
+    user_in: schemas.UserUpdate,
+    current_user: models.User = Depends(services.get_current_user),
 ) -> Any:
     user = services.user.find_one(db, id=user_id)
     if not user:
@@ -49,9 +53,13 @@ def update_user(
     return user
 
 
-# TODO: Check authorization to delete user
 @router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_user(*, db: Session = Depends(get_db), user_id: UUID) -> Any:
+def delete_user(
+    *,
+    db: Session = Depends(get_db),
+    user_id: UUID,
+    current_user: models.User = Depends(services.get_current_user),
+) -> Any:
     user = services.user.find_one(db, id=user_id)
     if not user:
         raise HTTPException(
