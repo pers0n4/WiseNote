@@ -9,6 +9,7 @@ class NoteBase(BaseModel):
     title: Optional[str] = None
     content: Optional[str] = None
     memo: Optional[str] = None
+    is_favorite: Optional[bool] = None
 
 
 class NoteCreate(NoteBase):
@@ -27,6 +28,7 @@ class NoteInDBBase(BaseModel):
     user_id: UUID
     summary: Optional[str] = None
     memo: Optional[str] = None
+    is_favorite: bool
     created_at: datetime
     updated_at: datetime
 
