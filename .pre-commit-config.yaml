@@ -55,3 +55,13 @@ repos:
     rev: v0.910-1
     hooks:
       - id: mypy
+        args:
+          [
+            --config-file,
+            ./server/pyproject.toml,
+            --disable-error-code,
+            attr-defined,
+          ]
+        additional_dependencies:
+          - pydantic
+          - sqlalchemy

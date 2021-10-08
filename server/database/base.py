@@ -59,5 +59,5 @@ class Base:
     id: Any
 
     @declared_attr  # type: ignore
-    def __tablename__(cls):
+    def __tablename__(cls) -> str:
         return cls.__name__.lower()
