@@ -4,6 +4,7 @@ from .auth import (
     get_password_hash,
     verify_password,
 )
+from .note import note
 from .user import user
 
 # from app.models.base import Base
@@ -13,6 +14,7 @@ from .user import user
 
 __all__ = [
     "user",
+    "note",
     "get_current_user",
     "get_password_hash",
     "verify_password",
