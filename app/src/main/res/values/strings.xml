@@ -1,5 +1,9 @@
 <resources>
     <string name="app_name">Wise Note</string>
+    <string name="record_permission_required">Record permission is required.</string>
+    <string name="record_permission_not_available">Record permission is not available.</string>
+    <string name="record_permission_granted">Record permission was granted.</string>
+    <string name="record_permission_denied">Record permission request was denied.</string>
     <string name="menu_icon_description">Menu Icon</string>
     <string name="search_icon_description">Search Icon</string>
     <string name="home_middle_title">Note List</string>

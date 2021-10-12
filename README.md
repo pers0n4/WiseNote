@@ -5,7 +5,7 @@
 - [Python3](https://www.python.org/)
   - [pre-commit](https://pre-commit.com/)
 - JDK
-  - [Couiser](https://get-coursier.io/)
+  - [Coursier](https://get-coursier.io/)
 
 ## Installation
 
@@ -24,7 +24,7 @@
    pre-commit install
    ```
 
-3. Install Couiser
+3. Install Coursier
 
    - Linux & maxOS
 
