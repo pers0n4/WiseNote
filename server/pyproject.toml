@@ -6,7 +6,7 @@ authors = ["Dong-Young Kim <31337.persona@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.8"
-fastapi = "^0.68.1"
+fastapi = "^0.70.0"
 uvicorn = { extras = ["standard"], version = "^0.15.0" }
 pydantic = { extras = ["email"], version = "^1.8.2" }
 SQLAlchemy = { extras = ["mypy"], version = "^1.4.25" }
@@ -18,9 +18,10 @@ passlib = { extras = ["bcrypt"], version = "^1.7.4" }
 mypy = "^0.910"
 black = "^21.9b0"
 isort = { extras = ["requirements_deprecated_finder"], version = "^5.9.3" }
-flake8 = "^3.9.2"
-pre-commit = "^2.15.0"
+flake8 = "^4.0.1"
 bandit = "^1.7.0"
+pre-commit = "^2.15.0"
+commitizen = "^2.20.0"
 
 [tool.black]
 line-length = 88
