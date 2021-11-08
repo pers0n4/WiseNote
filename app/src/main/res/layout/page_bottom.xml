@@ -9,8 +9,9 @@
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_weight="1"
-        android:layout_marginLeft="40dp"
+        android:layout_marginLeft="20dp"
         android:src="@drawable/icon_home"
+        android:backgroundTint="#FFFFFF"
         android:contentDescription="@string/home_icon_description" />
 
     <ImageButton
@@ -18,14 +19,16 @@
         android:layout_height="50dp"
         android:layout_weight="1"
         android:src="@drawable/icon_plus_circle"
+        android:backgroundTint="#FFFFFF"
         android:contentDescription="test" />
 
     <ImageButton
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_weight="1"
-        android:layout_marginRight="40dp"
+        android:layout_marginRight="20dp"
         android:src="@drawable/icon_person"
+        android:backgroundTint="#FFFFFF"
         android:contentDescription="@string/person_icon_description" />
 
 </LinearLayout>
