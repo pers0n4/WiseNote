@@ -4,4 +4,11 @@
     <string name="record_permission_not_available">Record permission is not available.</string>
     <string name="record_permission_granted">Record permission was granted.</string>
     <string name="record_permission_denied">Record permission request was denied.</string>
+    <string name="signin_title">[ SIGN IN ]</string>
+    <string name="signin">SIGN IN</string>
+    <string name="signup_title">[ SIGN UP ]</string>
+    <string name="signup">SIGN UP</string>
+    <string name="id">ID</string>
+    <string name="password">PASSWORD</string>
+    <string name="check_password">CHECK PASSWORD</string>
 </resources>

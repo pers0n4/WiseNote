@@ -11,7 +11,9 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.WiseNote">
+        android:theme="@style/Theme.WiseNote"
+        android:usesCleartextTraffic="true"
+        >
         <activity
             android:name=".MainActivity"
             android:exported="true">
@@ -20,6 +22,15 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity android:name=".SignupActivity">
+
+        </activity>
+        <activity android:name=".StartActivity">
+
+        </activity>
+        <activity android:name=".SigninActivity">
+
         </activity>
     </application>
 
