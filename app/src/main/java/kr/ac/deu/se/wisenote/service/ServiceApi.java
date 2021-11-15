@@ -13,6 +13,7 @@ import retrofit2.http.POST;
 public interface ServiceApi {
   @POST("users")
   Call<SignupResponse> userSignup(@Body SignupRequest signupRequest);
+
   @FormUrlEncoded
   @POST("/auth/token")
   Call<SigninResponse> userSignin(@Field("username") String username,@Field("password") String password);
