@@ -73,7 +73,7 @@ public class SignupActivity extends AppCompatActivity {
         }
       }
       @Override
-      public void onFailure(@NonNull Call<SignupResponse> call, @NonNull Throwable t) {
+      public void onFailure(Call<SignupResponse> call, Throwable t) {
         Log.d("post",t.getMessage());
         t.printStackTrace();
       }
