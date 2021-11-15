@@ -11,6 +11,8 @@ class NoteBase(BaseModel):
     memo: Optional[str] = None
     is_favorite: Optional[bool] = None
     notebook: Optional[str] = None
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
 
 
 class NoteCreate(NoteBase):
@@ -32,6 +34,8 @@ class NoteInDBBase(BaseModel):
     summary: Optional[str] = None
     memo: Optional[str] = None
     is_favorite: Optional[bool] = None
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
 
