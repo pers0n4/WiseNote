@@ -7,12 +7,15 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+
 import com.google.android.material.snackbar.Snackbar;
 
 public class MainActivity extends AppCompatActivity
@@ -20,7 +23,7 @@ public class MainActivity extends AppCompatActivity
 
   private static final int PERMISSION_REQUEST_RECORD = 0;
   private final int REQUEST_SPEECH = 1000;
-
+  private Button bt3;
   private View mainLayout;
 
   @Override
@@ -30,12 +33,25 @@ public class MainActivity extends AppCompatActivity
     mainLayout = findViewById(R.id.main_layout);
 
     findViewById(R.id.button).setOnClickListener(view -> prepareSpeech());
+
+    bt3 = (Button) findViewById(R.id.bt3);
+    bt3.setOnClickListener(
+        new View.OnClickListener() {
+          @Override
+          public void onClick(View view) {
+
+            Intent intent = new Intent(MainActivity.this, StartActivity.class);
+
+            startActivity(intent);
+
+            finish();
+          }
+        });
   }
 
   @Override
   public void onRequestPermissionsResult(
       int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-    super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     if (requestCode == PERMISSION_REQUEST_RECORD) {
       if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
         Snackbar.make(mainLayout, R.string.record_permission_granted, Snackbar.LENGTH_SHORT).show();
