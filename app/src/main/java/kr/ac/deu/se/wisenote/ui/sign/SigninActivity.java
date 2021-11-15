@@ -11,10 +11,10 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import kr.ac.deu.se.wisenote.MainActivity;
 import kr.ac.deu.se.wisenote.R;
 import kr.ac.deu.se.wisenote.service.RetrofitClient;
 import kr.ac.deu.se.wisenote.service.ServiceApi;
+import kr.ac.deu.se.wisenote.ui.home.HomeActivity;
 import kr.ac.deu.se.wisenote.vo.signin.SigninResponse;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -69,7 +69,7 @@ public class SigninActivity extends AppCompatActivity{
           SigninResponse result = response.body();
           result.setCode(response.code());
           Log.d("test","token:"+result.getAccess_token()+"code:"+result.getCode());
-          Intent intent = new Intent(SigninActivity.this, MainActivity.class);
+          Intent intent = new Intent(SigninActivity.this, HomeActivity.class);
           startActivity(intent);
         }else if(response.code() == 401){
           Toast.makeText(SigninActivity.this,"ID 또는 PASSOWRD를 잘못입력하셨습니다.",Toast.LENGTH_SHORT).show();
