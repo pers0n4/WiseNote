@@ -1,4 +1,4 @@
-package kr.ac.deu.se.wisenote;
+package kr.ac.deu.se.wisenote.ui.sign;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,10 +11,12 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import kr.ac.deu.se.wisenote.model.RetrofitClient;
-import kr.ac.deu.se.wisenote.model.ServiceApi;
-import kr.ac.deu.se.wisenote.model.signup.SignupRequest;
-import kr.ac.deu.se.wisenote.model.signup.SignupResponse;
+import kr.ac.deu.se.wisenote.R;
+import kr.ac.deu.se.wisenote.StartActivity;
+import kr.ac.deu.se.wisenote.service.RetrofitClient;
+import kr.ac.deu.se.wisenote.service.ServiceApi;
+import kr.ac.deu.se.wisenote.vo.signup.SignupRequest;
+import kr.ac.deu.se.wisenote.vo.signup.SignupResponse;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -69,7 +71,7 @@ public class SignupActivity extends AppCompatActivity {
         if(response.code() == 201){
           SignupResponse result = response.body();
           Log.d("Post ","onResponse 성공 결과:"+result.toString());
-          Intent intent = new Intent(SignupActivity.this,StartActivity.class);
+          Intent intent = new Intent(SignupActivity.this, StartActivity.class);
           startActivity(intent);
         }else{
           Toast.makeText(SignupActivity.this, "ID 형식이 잘못되었습니다.", Toast.LENGTH_SHORT).show();

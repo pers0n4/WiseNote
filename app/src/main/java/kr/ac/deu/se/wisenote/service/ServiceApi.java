@@ -1,9 +1,9 @@
-package kr.ac.deu.se.wisenote.model;
+package kr.ac.deu.se.wisenote.service;
 
 
-import kr.ac.deu.se.wisenote.model.signin.SigninResponse;
-import kr.ac.deu.se.wisenote.model.signup.SignupRequest;
-import kr.ac.deu.se.wisenote.model.signup.SignupResponse;
+import kr.ac.deu.se.wisenote.vo.signin.SigninResponse;
+import kr.ac.deu.se.wisenote.vo.signup.SignupRequest;
+import kr.ac.deu.se.wisenote.vo.signup.SignupResponse;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.Field;

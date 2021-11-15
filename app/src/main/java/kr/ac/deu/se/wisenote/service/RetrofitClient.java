@@ -1,4 +1,4 @@
-package kr.ac.deu.se.wisenote.model;
+package kr.ac.deu.se.wisenote.service;
 
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;

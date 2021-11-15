@@ -1,4 +1,4 @@
-package kr.ac.deu.se.wisenote.model.signin;
+package kr.ac.deu.se.wisenote.vo.signin;
 
 import com.google.gson.annotations.SerializedName;
 
