@@ -4,6 +4,7 @@ import android.os.Bundle;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.tabs.TabLayout;
@@ -24,9 +25,9 @@ public class HomeActivity extends AppCompatActivity {
     viewPager.setOffscreenPageLimit(3);
 
     // Fragment 생성
-    FavoriteFragment favoriteFragment = new FavoriteFragment();
-    RecentFragment recentFragment = new RecentFragment();
-    MapFragment mapFragment = new MapFragment();
+    Fragment favoriteFragment = new FavoriteFragment();
+    Fragment recentFragment = new RecentFragment();
+    Fragment mapFragment = new MapFragment();
 
     // ViewPagerAdapter 를 이용하여 Fragment 연결
     ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(this);
