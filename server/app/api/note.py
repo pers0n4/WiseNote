@@ -16,8 +16,15 @@ def read_notes_by_user(
     *,
     db: Session = Depends(get_db),
     current_user: models.User = Depends(services.get_current_user),
+    page_size: int = 30,
+    page: int = 1,
 ) -> Any:
-    notes = services.note.find_by_user(db, user_id=current_user.id)  # type: ignore
+    notes = services.note.find_by_user(
+        db,
+        user_id=current_user.id,  # type: ignore
+        limit=page_size,
+        offset=page_size * (page - 1),
+    )
     return notes
 
 
