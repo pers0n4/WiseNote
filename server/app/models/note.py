@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import Boolean, Column, DateTime, ForeignKey, String
+from sqlalchemy import Boolean, Column, DateTime, Float, ForeignKey, String
 from sqlalchemy.orm import RelationshipProperty, relationship
 
 from database.base import GUID, Base
@@ -25,6 +25,8 @@ class Note(Base):
     summary = Column(String(255))
     memo = Column(String)
     is_favorite = Column(Boolean, default=False)
+    latitude = Column(Float)
+    longitude = Column(Float)
     created_at = Column(DateTime, default=datetime.now)
     updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
 
