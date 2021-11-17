@@ -11,4 +11,17 @@
     <string name="id">ID</string>
     <string name="password">PASSWORD</string>
     <string name="check_password">CHECK PASSWORD</string>
+    <!-- Page Top Icon Description  -->
+    <string name="menu_icon_description">Menu icon shows the hamburger menu.</string>
+    <string name="search_icon_description">Search icon shows the search page.</string>
+    <!-- Page Bottom Icon Description -->
+    <string name="home_icon_description">Home icon moves page to the homepage.</string>
+    <string name="plus_icon_description">The Plus icon displays a pop-up where you can pick to record or add files.</string>
+    <string name="person_icon_description">Person icon moves page to the my page.</string>
+    <!-- Homepage String Resource  -->
+    <string name="home_middle_title">Note List</string>
+    <string name="home_description">Every notes you wrote.</string>
+    <string name="title_activity_main2">MainActivity2</string>
+    <string name="tab_text_1">Tab 1</string>
+    <string name="tab_text_2">Tab 2</string>
 </resources>

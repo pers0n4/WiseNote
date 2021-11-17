@@ -8,6 +8,9 @@ import android.widget.Button;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import kr.ac.deu.se.wisenote.ui.sign.SigninActivity;
+import kr.ac.deu.se.wisenote.ui.sign.SignupActivity;
+
 public class StartActivity extends AppCompatActivity {
 
 
@@ -24,7 +27,7 @@ public class StartActivity extends AppCompatActivity {
     goSignin.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
-        Intent intent = new Intent(StartActivity.this,SigninActivity.class);
+        Intent intent = new Intent(StartActivity.this, SigninActivity.class);
         startActivity(intent);
       }
     });
@@ -32,7 +35,7 @@ public class StartActivity extends AppCompatActivity {
     goSignup.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
-        Intent intent = new Intent(StartActivity.this,SignupActivity.class);
+        Intent intent = new Intent(StartActivity.this, SignupActivity.class);
         startActivity(intent);
       }
     });

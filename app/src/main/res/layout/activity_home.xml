@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginVertical="20dp"
+    android:layout_marginHorizontal="30dp"
+    android:orientation="vertical">
+    <include layout="@layout/page_top"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="60dp"
+        android:paddingBottom="40sp"
+        android:orientation="vertical">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/home_middle_title"
+            android:textSize="25sp"
+            android:textStyle="bold"
+            android:textColor="#131313"
+            android:fontFamily="@font/bahnschrift"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/home_description"
+            android:textSize="15sp"
+            android:textColor="#777777"
+            android:fontFamily="@font/bahnschrift"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tabs"
+            android:background="@android:color/white"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:layout_weight="1"
+            app:tabTextColor="#929292"
+            app:tabIndicatorColor="#F5C428"
+            app:tabIndicatorHeight="2dp"
+            app:tabSelectedTextColor="#F5C428"
+            android:fontFamily="@font/bahnschrift"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:paddingLeft="13dp"
+            android:text="More notes"
+            android:textSize="15sp"
+            android:gravity="center_vertical"/>
+    </LinearLayout>
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/view_pager"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        app:layout_behavior="com.google.android.material.AppBarLayout$ScrollingViewBehavior"/>
+
+    <include layout="@layout/page_bottom"/>
+</LinearLayout>
