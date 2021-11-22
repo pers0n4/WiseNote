@@ -59,7 +59,7 @@ public class SigninActivity extends AppCompatActivity{
         if(response.code() == 200){
           SigninResponse result = response.body();
           result.setCode(response.code());
-          /* TODO ADD sharedPreferences for store token */
+
           SharedPreferences sharedPref =
             getSharedPreferences("wisenote", Context.MODE_PRIVATE);
           SharedPreferences.Editor editor = sharedPref.edit();
