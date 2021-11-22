@@ -13,4 +13,5 @@ import retrofit2.http.GET;
 public interface NoteService {
   @GET("/notes")
   Call<List<Note>> getNotes();
+
 }

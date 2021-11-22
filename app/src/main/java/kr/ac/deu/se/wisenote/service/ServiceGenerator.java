@@ -1,7 +1,5 @@
 package kr.ac.deu.se.wisenote.service;
 
-import android.text.TextUtils;
-
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -21,7 +19,7 @@ public class ServiceGenerator {
   }
 
   public static <S> S createService(Class<S> serviceClass, String authToken) {
-    if (!TextUtils.isEmpty(authToken)) {
+    if (!(authToken == null)) {
       AuthenticationInterceptor interceptor =
         new AuthenticationInterceptor("Bearer " + authToken);
 
@@ -31,6 +29,7 @@ public class ServiceGenerator {
         builder.client(httpClient.build());
         retrofit = builder.build();
       }
+      return retrofit.create(serviceClass);
     }
     return retrofit.create(serviceClass);
   }

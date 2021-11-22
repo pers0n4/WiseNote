@@ -1,5 +1,7 @@
 package kr.ac.deu.se.wisenote.ui.home;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
@@ -20,12 +22,16 @@ public class HomeActivity extends AppCompatActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_home);
 
+    // token 정보 가져오기
+    SharedPreferences sharedPref = getSharedPreferences("wisenote", Context.MODE_PRIVATE);
+    String token = sharedPref.getString("token", null);
+
     // ViewPager 설정
     ViewPager2 viewPager = findViewById(R.id.view_pager);
     viewPager.setOffscreenPageLimit(3);
 
     // Fragment 생성
-    Fragment favoriteFragment = new FavoriteFragment();
+    Fragment favoriteFragment = new FavoriteFragment(token);
     Fragment recentFragment = new RecentFragment();
     Fragment mapFragment = new MapFragment();
 

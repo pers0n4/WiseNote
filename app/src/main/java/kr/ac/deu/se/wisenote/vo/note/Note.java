@@ -32,7 +32,7 @@ public class Note {
   private String memo;
 
   @SerializedName("is_favorite")
-  private String is_favorite;
+  private Boolean is_favorite;
 
   @SerializedName("created_at")
   private Date created_at;
