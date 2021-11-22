@@ -1,8 +1,9 @@
 package kr.ac.deu.se.wisenote.ui.sign;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -36,7 +37,6 @@ public class SigninActivity extends AppCompatActivity{
     service = ServiceGenerator.createService(ServiceApi.class);
 
     signinButton.setOnClickListener(view -> {
-      Log.d("test ","버큰클릭 확인");
       check(signinId,signinPassword);
     });
   }
@@ -47,7 +47,6 @@ public class SigninActivity extends AppCompatActivity{
     if(id.isEmpty() || password.isEmpty()){
       Toast.makeText(this, "빈칸을 입력하세요", Toast.LENGTH_SHORT).show();
     }else{
-      Log.d("test","check()메소드 실행"+id);
       signIn(id,password);
     }
   }
@@ -57,11 +56,16 @@ public class SigninActivity extends AppCompatActivity{
     service.userSignin(id,password).enqueue(new Callback<SigninResponse>() {
       @Override
       public void onResponse(@NonNull Call<SigninResponse> call, @NonNull Response<SigninResponse> response) {
-        Log.d("test","연결성공"+response.code());
         if(response.code() == 200){
           SigninResponse result = response.body();
           result.setCode(response.code());
-          Log.d("test","token:"+result.getAccess_token()+"code:"+result.getCode());
+
+          SharedPreferences sharedPref =
+            getSharedPreferences("wisenote", Context.MODE_PRIVATE);
+          SharedPreferences.Editor editor = sharedPref.edit();
+          editor.putString("token", result.getAccess_token());
+          editor.commit();
+
           Intent intent = new Intent(SigninActivity.this, HomeActivity.class);
           startActivity(intent);
         }else if(response.code() == 401){
