@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginVertical="20dp"
+    android:layout_marginHorizontal="30dp"
+    android:orientation="vertical">
+    <include layout="@layout/page_top"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="60dp"
+        android:paddingBottom="40sp"
+        android:orientation="vertical">
+        <TextView
+            android:id="@+id/notebook_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/home_middle_title"
+            android:textSize="25sp"
+            android:textStyle="bold"
+            android:textColor="#131313"
+            android:fontFamily="@font/bahnschrift"/>
+        <TextView
+            android:id="@+id/notebook_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/home_description"
+            android:textSize="15sp"
+            android:textColor="#777777"
+            android:fontFamily="@font/bahnschrift"/>
+    </LinearLayout>
+
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:id="@+id/note_list_view"/>
+
+    <include layout="@layout/page_bottom"/>
+</LinearLayout>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="5dp"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:weightSum="1"
+    android:padding="10dp"
+    android:background="@drawable/note_border_radius">
+    <TextView
+        android:id="@+id/note_name"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="NoteName"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="#131313"
+        android:fontFamily="@font/bahnschrift"/>
+
+    <TextView
+        android:id="@+id/note_description"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="Note description"
+        android:textSize="18dp"
+        android:textColor="#686868"
+        android:fontFamily="@font/bahnschrift"/>
+
+    <TextView
+        android:id="@+id/note_created_date"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="Thursday, Sep 30, 2021"
+        android:textSize="15dp"
+        android:textColor="#686868"
+        android:fontFamily="@font/bahnschrift"/>
+</LinearLayout>
