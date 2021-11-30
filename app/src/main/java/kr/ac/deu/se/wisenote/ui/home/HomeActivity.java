@@ -32,11 +32,11 @@ import com.google.android.material.tabs.TabLayoutMediator;
 import java.util.List;
 
 import kr.ac.deu.se.wisenote.R;
+import kr.ac.deu.se.wisenote.ui.notelist.NoteListActivity;
 import kr.ac.deu.se.wisenote.service.NotebookService;
 import kr.ac.deu.se.wisenote.service.ServiceGenerator;
 import kr.ac.deu.se.wisenote.ui.hamburger.HamburgerListAdapter;
 import kr.ac.deu.se.wisenote.ui.memo.MemoActivity;
-import kr.ac.deu.se.wisenote.ui.notelist.NoteActivity;
 import kr.ac.deu.se.wisenote.vo.notebooks.Notebook;
 import kr.ac.deu.se.wisenote.vo.notebooks.NotebookRequest;
 import retrofit2.Call;
@@ -139,7 +139,7 @@ public class HomeActivity extends AppCompatActivity {
 
   // All Note List View Button Click Event
   private final View.OnClickListener noteListClickListener = view -> {
-    Intent intent = new Intent(getApplicationContext(), NoteActivity.class);
+    Intent intent = new Intent(getApplicationContext(), NoteListActivity.class);
     startActivity(intent);
   };
 
