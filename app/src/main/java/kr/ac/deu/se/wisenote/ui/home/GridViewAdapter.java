@@ -25,13 +25,17 @@ public class GridViewAdapter extends BaseAdapter {
     items.add(item);
   }
 
+  public void replace(ArrayList<Note> items) {
+    this.items = items;
+  }
+
   @Override
   public int getCount() {
     return items.size();
   }
 
   @Override
-  public Object getItem(int position) {
+  public Note getItem(int position) {
     return items.get(position);
   }
 
@@ -43,12 +47,24 @@ public class GridViewAdapter extends BaseAdapter {
   @Override
   public View getView(int position, View view, ViewGroup viewGroup) {
     context = viewGroup.getContext();
-    Note noteItem = items.get(position);
+    ViewHolder holder;
 
     if(view == null) {
+      holder = new ViewHolder();
+
       LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
       view = inflater.inflate(R.layout.activity_home_note_item, viewGroup, false);
+
+      holder.titleText = view.findViewById(R.id.note_title);
+      holder.descriptionText = view.findViewById(R.id.note_description);
+      holder.dateText = view.findViewById(R.id.note_created_date);
+
+      view.setTag(holder);
+    } else {
+      holder = (ViewHolder) view.getTag();
     }
+
+    Note noteItem = getItem(position);
 
     // 배경 색상 랜덤 지정
     RandomColors colors = new RandomColors();
@@ -57,19 +73,21 @@ public class GridViewAdapter extends BaseAdapter {
     drawable.setColor(colors.getColor());
 
     // 텍스트 정보 입력
-    TextView titleText = view.findViewById(R.id.note_title);
-    TextView descriptionText = view.findViewById(R.id.note_description);
-    TextView dateText = view.findViewById(R.id.note_created_date);
-
     String pattern = "yyyy-MM-dd";
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
     String data = simpleDateFormat.format(noteItem.getCreated_at());
 
-    titleText.setText(noteItem.getTitle());
-    descriptionText.setText(noteItem.getSummary());
-    dateText.setText(data);
+    holder.titleText.setText(noteItem.getTitle());
+    holder.descriptionText.setText(noteItem.getSummary());
+    holder.dateText.setText(data);
 
     return view;
+  }
+
+  private class ViewHolder {
+    TextView titleText;
+    TextView descriptionText;
+    TextView dateText;
   }
 
   private class RandomColors {

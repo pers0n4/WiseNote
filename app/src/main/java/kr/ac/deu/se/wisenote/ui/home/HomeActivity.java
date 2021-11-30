@@ -32,7 +32,7 @@ public class HomeActivity extends AppCompatActivity {
 
     // Fragment 생성
     Fragment favoriteFragment = new FavoriteFragment(token);
-    Fragment recentFragment = new RecentFragment();
+    Fragment recentFragment = new RecentFragment(token);
     Fragment mapFragment = new MapFragment();
 
     // ViewPagerAdapter 를 이용하여 Fragment 연결
