@@ -1,5 +1,7 @@
 package kr.ac.deu.se.wisenote.ui.home;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Color;
@@ -84,13 +86,17 @@ public class HomeActivity extends AppCompatActivity {
     deleteDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
     deleteDialog.setContentView(R.layout.hamburger_delete_dialog);
 
+    // token 정보 가져오기
+    SharedPreferences sharedPref = getSharedPreferences("wisenote", Context.MODE_PRIVATE);
+    String token = sharedPref.getString("token", null);
+
     // ViewPager 설정
     ViewPager2 viewPager = findViewById(R.id.view_pager);
     viewPager.setOffscreenPageLimit(3);
 
     // Fragment 생성
-    Fragment favoriteFragment = new FavoriteFragment();
-    Fragment recentFragment = new RecentFragment();
+    Fragment favoriteFragment = new FavoriteFragment(token);
+    Fragment recentFragment = new RecentFragment(token);
     Fragment mapFragment = new MapFragment();
 
     // ViewPagerAdapter 를 이용하여 Fragment 연결

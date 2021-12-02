@@ -12,14 +12,6 @@ public class SigninResponse {
 
   private SigninResponse() {};
 
-  private static class LazyHolder {
-    private static final SigninResponse INSTANCE = new SigninResponse();
-  }
-
-  private static SigninResponse getInstance() {
-    return LazyHolder.INSTANCE;
-  }
-
   private int code;
 
   public int getCode(){

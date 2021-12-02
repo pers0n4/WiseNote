@@ -17,4 +17,5 @@ public interface NoteService {
 
   @GET("/notes/{note_id}")
   Call<Note> getNote(@Path("note_id")String note_id);
+
 }
