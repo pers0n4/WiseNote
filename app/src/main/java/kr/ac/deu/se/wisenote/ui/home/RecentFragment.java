@@ -48,7 +48,6 @@ public class RecentFragment extends Fragment {
       public void onResponse(Call<List<Note>> call, Response<List<Note>> response) {
         if(response.isSuccessful()) {
           List<Note> notes = response.body();
-          Log.d("recent", notes.toString());
           itemList.addAll(notes);
           adapter.replace(itemList);
           adapter.notifyDataSetChanged();
