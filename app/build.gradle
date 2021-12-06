@@ -48,4 +48,6 @@ dependencies {
     // Lombok
     implementation 'org.projectlombok:lombok:1.18.22'
     annotationProcessor 'org.projectlombok:lombok:1.18.22'
+    //이미지 둥글게
+    implementation 'de.hdodenhof:circleimageview:3.1.0'
 }

@@ -1,7 +1,5 @@
-package kr.ac.deu.se.wisenote.ui.home;
+package kr.ac.deu.se.wisenote.ui.memo;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Color;
@@ -28,22 +26,21 @@ import androidx.viewpager2.widget.ViewPager2;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import kr.ac.deu.se.wisenote.R;
 import kr.ac.deu.se.wisenote.service.NotebookService;
 import kr.ac.deu.se.wisenote.service.ServiceGenerator;
 import kr.ac.deu.se.wisenote.ui.hamburger.HamburgerListAdapter;
-import kr.ac.deu.se.wisenote.ui.memo.MemoActivity;
-import kr.ac.deu.se.wisenote.ui.sign.SigninActivity;
+import kr.ac.deu.se.wisenote.ui.home.HomeActivity;
+import kr.ac.deu.se.wisenote.ui.home.ViewPagerAdapter;
 import kr.ac.deu.se.wisenote.vo.notebooks.Notebook;
 import kr.ac.deu.se.wisenote.vo.notebooks.NotebookRequest;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class HomeActivity extends AppCompatActivity {
+public class MemoActivity extends AppCompatActivity {
   private LinearLayout favorite;
   private LinearLayout recycle;
   ListView listView;
@@ -59,63 +56,48 @@ public class HomeActivity extends AppCompatActivity {
   private EditText folderName;
   DrawerLayout drawerLayout;
 
-  private String[] titles = new String[]{"Favorite", "Recent", "Map"};
+  private String[] titles = new String[]{"Main","Text","Memo"};
 
   @Override
   protected void onCreate(@Nullable Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    setContentView(R.layout.activity_home);
-
+    setContentView(R.layout.activity_memo);
 
     Intent intent = getIntent();
     String auth_token = intent.getStringExtra("token");
-    Log.d("notebooks",auth_token);
-
-    //
     service = ServiceGenerator.createService(NotebookService.class,auth_token);
-
     listView = (ListView) findViewById(R.id.listview);
-    //adapter = new HamburgerListAdapter(notebooks,auth_token);
-    //listView.setAdapter(adapter);
     getData(auth_token);
-    //dialog 초기화
-    addDialog = new Dialog(HomeActivity.this);
+
+    addDialog = new Dialog(MemoActivity.this);
     addDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
     addDialog.setContentView(R.layout.hamburger_add_dialog);
-    deleteDialog = new Dialog(HomeActivity.this);
+    deleteDialog = new Dialog(MemoActivity.this);
     deleteDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
     deleteDialog.setContentView(R.layout.hamburger_delete_dialog);
 
-    // token 정보 가져오기
-    SharedPreferences sharedPref = getSharedPreferences("wisenote", Context.MODE_PRIVATE);
-    String token = sharedPref.getString("token", null);
-
-    // ViewPager 설정
-    ViewPager2 viewPager = findViewById(R.id.view_pager);
+    ViewPager2 viewPager = findViewById(R.id.view_pager_memo);
     viewPager.setOffscreenPageLimit(3);
 
-    // Fragment 생성
-    Fragment favoriteFragment = new FavoriteFragment(token);
-    Fragment recentFragment = new RecentFragment(token);
-    Fragment mapFragment = new MapFragment();
+    Fragment memoFragment = new MemoFragment();
+    Fragment textFragment = new TextFragment();
+    Fragment mainFragment = new MainFragment();
 
-    // ViewPagerAdapter 를 이용하여 Fragment 연결
     ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(this);
-    viewPagerAdapter.addFragment(favoriteFragment);
-    viewPagerAdapter.addFragment(recentFragment);
-    viewPagerAdapter.addFragment(mapFragment);
+    viewPagerAdapter.addFragment(mainFragment);
+    viewPagerAdapter.addFragment(textFragment);
+    viewPagerAdapter.addFragment(memoFragment);
     viewPager.setAdapter(viewPagerAdapter);
 
-    // TabLayout 에 ViewPager 연결
-    TabLayout tabLayout = findViewById(R.id.tabs);
-    new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> tab.setText(titles[position])).attach();
+    TabLayout tabLayout = findViewById(R.id.tabs_memo);
+    new TabLayoutMediator(tabLayout,viewPager,(tab, position) -> tab.setText(titles[position])).attach();
 
     //햄버거메뉴 나오기
     hamburger = (ImageButton) findViewById(R.id.hamButton);
     hamburger.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
-        drawerLayout = (DrawerLayout) findViewById(R.id.home_draw);
+        drawerLayout = (DrawerLayout) findViewById(R.id.memo_draw);
         if (!drawerLayout.isDrawerOpen(Gravity.LEFT)) {
           getData(auth_token);
           drawerLayout.openDrawer(Gravity.LEFT);
@@ -133,7 +115,7 @@ public class HomeActivity extends AppCompatActivity {
     listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
       @Override
       public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-        Toast.makeText(HomeActivity.this, "폴더클릭"+adapter.getFolderName(i), Toast.LENGTH_SHORT).show();
+        Toast.makeText(MemoActivity.this, "폴더클릭"+adapter.getFolderName(i), Toast.LENGTH_SHORT).show();
         drawerLayout.closeDrawer(Gravity.LEFT);
       }
     });
@@ -150,18 +132,14 @@ public class HomeActivity extends AppCompatActivity {
     favorite.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
-        Toast.makeText(HomeActivity.this,"favorite 클릭",Toast.LENGTH_SHORT).show();
-        // 테스트용 코드
-        Intent intent = new Intent(HomeActivity.this, MemoActivity.class);
-        intent.putExtra("token",auth_token);
-        startActivity(intent);
+        Toast.makeText(MemoActivity.this,"favorite 클릭",Toast.LENGTH_SHORT).show();
         drawerLayout.closeDrawer(Gravity.LEFT);
       }
     });
     recycle.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
-        Toast.makeText(HomeActivity.this, "recycle 클릭", Toast.LENGTH_SHORT).show();
+        Toast.makeText(MemoActivity.this, "recycle 클릭", Toast.LENGTH_SHORT).show();
         drawerLayout.closeDrawer(Gravity.LEFT);
       }
     });
