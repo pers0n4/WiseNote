@@ -1,5 +1,6 @@
 package kr.ac.deu.se.wisenote.ui.home;
 
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
@@ -18,7 +19,6 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -32,11 +32,10 @@ import com.google.android.material.tabs.TabLayoutMediator;
 import java.util.List;
 
 import kr.ac.deu.se.wisenote.R;
-import kr.ac.deu.se.wisenote.ui.notelist.NoteListActivity;
 import kr.ac.deu.se.wisenote.service.NotebookService;
 import kr.ac.deu.se.wisenote.service.ServiceGenerator;
 import kr.ac.deu.se.wisenote.ui.hamburger.HamburgerListAdapter;
-import kr.ac.deu.se.wisenote.ui.memo.MemoActivity;
+import kr.ac.deu.se.wisenote.ui.notelist.NoteListActivity;
 import kr.ac.deu.se.wisenote.vo.notebooks.Notebook;
 import kr.ac.deu.se.wisenote.vo.notebooks.NotebookRequest;
 import retrofit2.Call;
@@ -51,7 +50,6 @@ public class HomeActivity extends AppCompatActivity {
   private Dialog addDialog;
   private Dialog deleteDialog;
   private EditText folderName;
-  private DrawerLayout drawerLayout;
 
   private final String[] titles = new String[]{"Favorite", "Recent", "Map"};
   private String token;
@@ -61,17 +59,19 @@ public class HomeActivity extends AppCompatActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_home);
 
-    // note 목록 화면으로 전환
-    TextView tv_notelist = findViewById(R.id.note_list_button);
-    tv_notelist.setOnClickListener(noteListClickListener);
+    // token 정보 가져오기
+    SharedPreferences sharedPref = getSharedPreferences("wisenote", Context.MODE_PRIVATE);
+    token = sharedPref.getString("token", null);
 
     // 하단 navigation button 구현
     ImageButton home_button = findViewById(R.id.home_button);
     home_button.setOnClickListener(homeClickListener);
+    ImageButton my_page_button = findViewById(R.id.mypage_button);
+    my_page_button.setOnClickListener(myPageClickListener);
 
-    // token 정보 가져오기
-    SharedPreferences sharedPref = getSharedPreferences("wisenote", Context.MODE_PRIVATE);
-    token = sharedPref.getString("token", null);
+    // 탭 뷰 옆 모든 노트 목록 확인 버튼
+    TextView tv_notelist = findViewById(R.id.note_list_button);
+    tv_notelist.setOnClickListener(noteListClickListener);
 
     // ViewPager 설정
     ViewPager2 viewPager = findViewById(R.id.view_pager);
@@ -93,7 +93,6 @@ public class HomeActivity extends AppCompatActivity {
     TabLayout tabLayout = findViewById(R.id.tabs);
     new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> tab.setText(titles[position])).attach();
 
-
     service = ServiceGenerator.createService(NotebookService.class,token);
     listView = findViewById(R.id.listview);
     getData(token);
@@ -107,39 +106,34 @@ public class HomeActivity extends AppCompatActivity {
 
     // 햄버거메뉴 나오기
     ImageButton hamburger = findViewById(R.id.hamButton);
-    hamburger.setOnClickListener(hambugerMenu);
+    hamburger.setOnClickListener(hamburgerMenu);
 
     // 햄버거 메뉴 플러스 버튼
     ImageButton addFolder = findViewById(R.id.addFolder);
     addFolder.setOnClickListener(addFolderClickEvent);
+
+    // Hamburger Menu All note view Button
+    LinearLayout all_notes = findViewById(R.id.all_notes);
+    all_notes.setOnClickListener(noteListClickListener);
+
+    // Hamburger Menu Folder Item Click Event
     listView.setOnItemClickListener(folderItemClickEvent);
     listView.setOnItemLongClickListener(folderItemLongClickEvent);
 
     LinearLayout favorite = findViewById(R.id.favorite);
-    LinearLayout recycle = findViewById(R.id.recycle);
-    favorite.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View view) {
-        Toast.makeText(HomeActivity.this,"favorite 클릭",Toast.LENGTH_SHORT).show();
-        // 테스트용 코드
-        Intent intent = new Intent(HomeActivity.this, MemoActivity.class);
-        intent.putExtra("token",token);
-        startActivity(intent);
-        drawerLayout.closeDrawer(Gravity.LEFT);
-      }
-    });
-    recycle.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View view) {
-        Toast.makeText(HomeActivity.this, "recycle 클릭", Toast.LENGTH_SHORT).show();
-        drawerLayout.closeDrawer(Gravity.LEFT);
-      }
-    });
+    favorite.setOnClickListener(favoriteNoteListClickListener);
   }
 
   // All Note List View Button Click Event
   private final View.OnClickListener noteListClickListener = view -> {
     Intent intent = new Intent(getApplicationContext(), NoteListActivity.class);
+    startActivity(intent);
+  };
+
+  // Favorite Note List View Button Click Event
+  private final View.OnClickListener favoriteNoteListClickListener = view -> {
+    Intent intent = new Intent(getApplicationContext(), NoteListActivity.class);
+    intent.putExtra("NotebookTitle", "favorite");
     startActivity(intent);
   };
 
@@ -149,9 +143,16 @@ public class HomeActivity extends AppCompatActivity {
     startActivity(intent);
   };
 
+  // Bottom Menu My Page Button Click Event
+  private final View.OnClickListener myPageClickListener = view -> {
+    Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
+    startActivity(intent);
+  };
+
   // Hamburger Menu 나오기
-  private final View.OnClickListener hambugerMenu = view -> {
-    drawerLayout = findViewById(R.id.home_draw);
+  @SuppressLint("RtlHardcoded")
+  private final View.OnClickListener hamburgerMenu = view -> {
+    DrawerLayout drawerLayout = findViewById(R.id.home_draw);
     if (!drawerLayout.isDrawerOpen(Gravity.LEFT)) {
       getData(token);
       drawerLayout.openDrawer(Gravity.LEFT);
@@ -164,9 +165,11 @@ public class HomeActivity extends AppCompatActivity {
   };
 
   // Folder Item Click Event
+  @SuppressLint("RtlHardcoded")
   private final AdapterView.OnItemClickListener folderItemClickEvent = (adapterView, view, i, l) ->  {
-    Toast.makeText(HomeActivity.this, "폴더클릭"+adapter.getFolderName(i), Toast.LENGTH_SHORT).show();
-    drawerLayout.closeDrawer(Gravity.LEFT);
+    Intent intent = new Intent(getApplicationContext(), NoteListActivity.class);
+    intent.putExtra("NotebookTitle", adapter.getFolderName(i));
+    startActivity(intent);
   };
 
   // Folder Item Long Click Event
@@ -174,7 +177,6 @@ public class HomeActivity extends AppCompatActivity {
     deleteDialog(i,token);
     return false;
   };
-
 
   // 폴더 추가
   public void addDialog(String token) {
@@ -231,5 +233,4 @@ public class HomeActivity extends AppCompatActivity {
       }
     });
   }
-
 }
