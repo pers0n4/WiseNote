@@ -31,6 +31,9 @@ public class Note {
   @SerializedName("memo")
   private String memo;
 
+  @SerializedName("notebook")
+  private String notebook;
+
   @SerializedName("is_favorite")
   private Boolean is_favorite;
 
@@ -64,6 +67,10 @@ public class Note {
     return notebook_id;
   }
 
+  public void setNotebook_id(String notebook_id) {
+    this.notebook_id = notebook_id;
+  }
+
   public String getSummary() {
     return summary;
   }
@@ -86,5 +93,13 @@ public class Note {
 
   public Date getUpdated_at() {
     return updated_at;
+  }
+
+  public String getNotebook() {
+    return notebook;
+  }
+
+  public void setNotebook(String notebook) {
+    this.notebook = notebook;
   }
 }

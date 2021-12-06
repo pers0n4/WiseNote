@@ -42,6 +42,7 @@ import kr.ac.deu.se.wisenote.service.NoteService;
 import kr.ac.deu.se.wisenote.service.NotebookService;
 import kr.ac.deu.se.wisenote.service.ServiceGenerator;
 import kr.ac.deu.se.wisenote.ui.hamburger.HamburgerListAdapter;
+import kr.ac.deu.se.wisenote.ui.home.HomeActivity;
 import kr.ac.deu.se.wisenote.ui.home.ViewPagerAdapter;
 import kr.ac.deu.se.wisenote.vo.note.Note;
 import kr.ac.deu.se.wisenote.vo.notebooks.Notebook;
@@ -51,6 +52,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class MemoActivity extends AppCompatActivity {
+  private Notebook spinnerNotebook;
   private LinearLayout favorite;
   private LinearLayout recycle;
   private TextView title;
@@ -74,6 +76,8 @@ public class MemoActivity extends AppCompatActivity {
   private EditText folderName;
   private EditText editTitle;
   private DrawerLayout drawerLayout;
+  private ImageButton homeButton;
+  private Spinner spinner;
 
   private String[] titles = new String[]{"Main","Text","Memo"};
 
@@ -107,7 +111,7 @@ public class MemoActivity extends AppCompatActivity {
     editDialog.setContentView(R.layout.memo_edit_dialog);
 
     editTitle = (EditText) editDialog.findViewById(R.id.editNoteTitle);
-
+    spinner = (Spinner) editDialog.findViewById(R.id.spinner);
 
     ViewPager2 viewPager = findViewById(R.id.view_pager_memo);
     viewPager.setOffscreenPageLimit(3);
@@ -215,14 +219,20 @@ public class MemoActivity extends AppCompatActivity {
       });
       ok = (Button)editDialog.findViewById(R.id.ok);
       ok.setOnClickListener(new View.OnClickListener() {
+        String folderId;
+        Notebook notebook = new Notebook();
         @Override
         public void onClick(View view) {
+          notebook = (Notebook) spinner.getSelectedItem();
+          folderId = notebook.getId();
           note.setTitle(editTitle.getText().toString());
-          Log.d("editTitle","title: "+ editTitle.getText().toString());
+          note.setNotebook(folderId);
+          Log.d("editFolder","folder id"+ folderId);
           noteService.setNote(noteId,note).enqueue(new Callback<Note>() {
             @Override
             public void onResponse(Call<Note> call, Response<Note> response) {
-              Log.d("editTitle","title:"+note.getTitle()+"code:"+response.code());
+              note = response.body();
+              Log.d("editNote","title  :  "+note.getTitle()+"  folderId : "+note.getNotebook_id()+"code:"+response.code());
               getNote(noteId);
             }
 
@@ -234,7 +244,14 @@ public class MemoActivity extends AppCompatActivity {
           editDialog.dismiss();
         }
       });
-
+      homeButton = (ImageButton)findViewById(R.id.homeButton);
+      homeButton.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+          Intent intent = new Intent(MemoActivity.this, HomeActivity.class);
+          startActivity(intent);
+        }
+      });
   }
   // 폴더 추가
   public void addDialog(String auth_token) {
@@ -295,6 +312,8 @@ public class MemoActivity extends AppCompatActivity {
     editDialog.show();
     editDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
     editTitle.setText(note.getTitle());
+    MemoSpinnerAdapter memoAdapter = new MemoSpinnerAdapter(notebooks);
+    spinner.setAdapter(memoAdapter);
   }
   // 햄버거메뉴 폴더 리스트 가져오기
   public void getData(String token) {

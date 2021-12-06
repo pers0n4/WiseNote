@@ -29,9 +29,8 @@ public class MemoSpinnerAdapter extends BaseAdapter {
 
   @Override
   public int getCount() {
-    return 0;
+    return lists.size();
   }
-
   @Override
   public Object getItem(int i) {
     return lists.get(i);
@@ -50,12 +49,10 @@ public class MemoSpinnerAdapter extends BaseAdapter {
       view = inflater.inflate(R.layout.spinner_list_item, viewGroup,false);
     }
 
-      Notebook notebook = lists.get(i);
 
       TextView title = (TextView)view.findViewById(R.id.textView21);
 
-      title.setText(notebook.getName());
-      Log.d("spinner","name2:"+notebook.getName());
+      title.setText(lists.get(i).getName());
 
     return view;
   }
@@ -67,12 +64,12 @@ public class MemoSpinnerAdapter extends BaseAdapter {
       LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
       convertView = inflater.inflate(R.layout.spinner_dropdown_item,parent,false);
     }
-    Notebook notebook = lists.get(position);
+
 
     TextView title = (TextView)convertView.findViewById(R.id.textView22);
 
-    title.setText(notebook.getName());
-    Log.d("spinner","name3:"+notebook.getName());
+    title.setText(lists.get(position).getName());
+
 
     return convertView;
   }
