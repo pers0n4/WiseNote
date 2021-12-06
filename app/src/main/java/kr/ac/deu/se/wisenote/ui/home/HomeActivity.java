@@ -67,17 +67,7 @@ public class HomeActivity extends AppCompatActivity {
     setContentView(R.layout.activity_home);
 
 
-    Intent intent = getIntent();
-    String auth_token = intent.getStringExtra("token");
-    Log.d("notebooks",auth_token);
 
-    //
-    service = ServiceGenerator.createService(NotebookService.class,auth_token);
-
-    listView = (ListView) findViewById(R.id.listview);
-    //adapter = new HamburgerListAdapter(notebooks,auth_token);
-    //listView.setAdapter(adapter);
-    getData(auth_token);
     //dialog 초기화
     addDialog = new Dialog(HomeActivity.this);
     addDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -89,6 +79,10 @@ public class HomeActivity extends AppCompatActivity {
     // token 정보 가져오기
     SharedPreferences sharedPref = getSharedPreferences("wisenote", Context.MODE_PRIVATE);
     String token = sharedPref.getString("token", null);
+
+    service = ServiceGenerator.createService(NotebookService.class,token);
+    listView = (ListView) findViewById(R.id.listview);
+    getData(token);
 
     // ViewPager 설정
     ViewPager2 viewPager = findViewById(R.id.view_pager);
@@ -117,7 +111,7 @@ public class HomeActivity extends AppCompatActivity {
       public void onClick(View view) {
         drawerLayout = (DrawerLayout) findViewById(R.id.home_draw);
         if (!drawerLayout.isDrawerOpen(Gravity.LEFT)) {
-          getData(auth_token);
+          getData(token);
           drawerLayout.openDrawer(Gravity.LEFT);
         }
       }
@@ -127,7 +121,7 @@ public class HomeActivity extends AppCompatActivity {
     addFolder.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
-        addDialog(auth_token);
+        addDialog(token);
       }
     });
     listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -140,24 +134,21 @@ public class HomeActivity extends AppCompatActivity {
     listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
       @Override
       public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
-        deleteDialog(i,auth_token);
+        deleteDialog(i,token);
         return false;
       }
     });
-
+    //즐겨찾는 폴더
     favorite = (LinearLayout) findViewById(R.id.favorite);
     recycle = (LinearLayout) findViewById(R.id.recycle);
     favorite.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
         Toast.makeText(HomeActivity.this,"favorite 클릭",Toast.LENGTH_SHORT).show();
-        // 테스트용 코드
-        Intent intent = new Intent(HomeActivity.this, MemoActivity.class);
-        intent.putExtra("token",auth_token);
-        startActivity(intent);
         drawerLayout.closeDrawer(Gravity.LEFT);
       }
     });
+    // 휴지통 폴더
     recycle.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {

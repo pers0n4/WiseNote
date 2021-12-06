@@ -16,7 +16,7 @@ public class Note {
   @SerializedName("title")
   private String title;
 
-  @SerializedName("body")
+  @SerializedName("content")
   private String content;
 
   @SerializedName("user_id")
@@ -39,4 +39,52 @@ public class Note {
 
   @SerializedName("updated_at")
   private Date updated_at;
+
+  public String getId() {
+    return id;
+  }
+
+  public String getTitle() {
+    return title;
+  }
+
+  public void setTitle(String title) {
+    this.title = title;
+  }
+
+  public String getContent() {
+    return content;
+  }
+
+  public String getUser_id() {
+    return user_id;
+  }
+
+  public String getNotebook_id() {
+    return notebook_id;
+  }
+
+  public String getSummary() {
+    return summary;
+  }
+
+  public String getMemo() {
+    return memo;
+  }
+
+  public void setMemo(String memo) {
+    this.memo = memo;
+  }
+
+  public Boolean getIs_favorite() {
+    return is_favorite;
+  }
+
+  public Date getCreated_at() {
+    return created_at;
+  }
+
+  public Date getUpdated_at() {
+    return updated_at;
+  }
 }

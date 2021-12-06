@@ -51,3 +51,4 @@ dependencies {
     //이미지 둥글게
     implementation 'de.hdodenhof:circleimageview:3.1.0'
 }
+

@@ -1,10 +1,12 @@
 package kr.ac.deu.se.wisenote.ui.home;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.Toast;
 
@@ -18,6 +20,7 @@ import java.util.List;
 import kr.ac.deu.se.wisenote.R;
 import kr.ac.deu.se.wisenote.service.NoteService;
 import kr.ac.deu.se.wisenote.service.ServiceGenerator;
+import kr.ac.deu.se.wisenote.ui.memo.MemoActivity;
 import kr.ac.deu.se.wisenote.vo.note.Note;
 import lombok.SneakyThrows;
 import retrofit2.Call;
@@ -65,7 +68,16 @@ public class RecentFragment extends Fragment {
     });
 
     gridView.setAdapter(adapter);
-
+    gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+      @Override
+      public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+        //Toast.makeText(view.getContext(), "test"+itemList.get(i).getTitle(),Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(view.getContext(), MemoActivity.class);
+        intent.putExtra("notdId",itemList.get(i).getId());
+        startActivity(intent);
+      }
+    });
     return view;
   }
+
 }
