@@ -44,22 +44,15 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class MemoActivity extends AppCompatActivity {
-  private LinearLayout favorite;
-  private LinearLayout recycle;
-  ListView listView;
-  List<Notebook> notebooks;
+  private ListView listView;
+  private List<Notebook> notebooks;
   private NotebookService service;
-  HamburgerListAdapter adapter;
-  private ImageButton hamburger;
-  private ImageButton addFolder;
+  private HamburgerListAdapter adapter;
   private Dialog addDialog;
   private Dialog deleteDialog;
-  private Button cancel;
-  private Button create;
   private EditText folderName;
-  DrawerLayout drawerLayout;
 
-  private String[] titles = new String[]{"Main","Text","Memo"};
+  private final String[] titles = new String[]{"Main","Text","Memo"};
   private String token;
 
   @Override
@@ -70,6 +63,12 @@ public class MemoActivity extends AppCompatActivity {
     // token 정보 가져오기
     SharedPreferences sharedPref = getSharedPreferences("wisenote", Context.MODE_PRIVATE);
     token = sharedPref.getString("token", null);
+
+    // 하단 navigation button 구현
+    ImageButton home_button = findViewById(R.id.home_button);
+    home_button.setOnClickListener(homeClickListener);
+    ImageButton my_page_button = findViewById(R.id.mypage_button);
+    my_page_button.setOnClickListener(myPageClickListener);
 
     ViewPager2 viewPager = findViewById(R.id.view_pager_memo);
     viewPager.setOffscreenPageLimit(3);
@@ -100,7 +99,7 @@ public class MemoActivity extends AppCompatActivity {
     deleteDialog.setContentView(R.layout.hamburger_delete_dialog);
 
     //햄버거메뉴 나오기
-    hamburger = findViewById(R.id.hamButton);
+    ImageButton hamburger = findViewById(R.id.hamButton);
     hamburger.setOnClickListener(hamburgerMenu);
 
     // 햄버거 메뉴 플러스 버튼
@@ -181,8 +180,8 @@ public class MemoActivity extends AppCompatActivity {
 
 
     folderName = addDialog.findViewById(R.id.editText);
-    cancel = addDialog.findViewById(R.id.cancel);
-    create = addDialog.findViewById(R.id.create);
+    Button cancel = addDialog.findViewById(R.id.cancel);
+    Button create = addDialog.findViewById(R.id.create);
 
 
     cancel.setOnClickListener(view -> addDialog.dismiss());
