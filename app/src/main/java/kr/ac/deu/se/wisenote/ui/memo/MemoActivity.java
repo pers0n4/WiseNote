@@ -1,7 +1,10 @@
 package kr.ac.deu.se.wisenote.ui.memo;
 
+import android.annotation.SuppressLint;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -15,7 +18,6 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -34,6 +36,7 @@ import kr.ac.deu.se.wisenote.service.ServiceGenerator;
 import kr.ac.deu.se.wisenote.ui.hamburger.HamburgerListAdapter;
 import kr.ac.deu.se.wisenote.ui.home.HomeActivity;
 import kr.ac.deu.se.wisenote.ui.home.ViewPagerAdapter;
+import kr.ac.deu.se.wisenote.ui.notelist.NoteListActivity;
 import kr.ac.deu.se.wisenote.vo.notebooks.Notebook;
 import kr.ac.deu.se.wisenote.vo.notebooks.NotebookRequest;
 import retrofit2.Call;
@@ -57,24 +60,16 @@ public class MemoActivity extends AppCompatActivity {
   DrawerLayout drawerLayout;
 
   private String[] titles = new String[]{"Main","Text","Memo"};
+  private String token;
 
   @Override
   protected void onCreate(@Nullable Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_memo);
 
-    Intent intent = getIntent();
-    String auth_token = intent.getStringExtra("token");
-    service = ServiceGenerator.createService(NotebookService.class,auth_token);
-    listView = (ListView) findViewById(R.id.listview);
-    getData(auth_token);
-
-    addDialog = new Dialog(MemoActivity.this);
-    addDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-    addDialog.setContentView(R.layout.hamburger_add_dialog);
-    deleteDialog = new Dialog(MemoActivity.this);
-    deleteDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-    deleteDialog.setContentView(R.layout.hamburger_delete_dialog);
+    // token 정보 가져오기
+    SharedPreferences sharedPref = getSharedPreferences("wisenote", Context.MODE_PRIVATE);
+    token = sharedPref.getString("token", null);
 
     ViewPager2 viewPager = findViewById(R.id.view_pager_memo);
     viewPager.setOffscreenPageLimit(3);
@@ -92,61 +87,95 @@ public class MemoActivity extends AppCompatActivity {
     TabLayout tabLayout = findViewById(R.id.tabs_memo);
     new TabLayoutMediator(tabLayout,viewPager,(tab, position) -> tab.setText(titles[position])).attach();
 
-    //햄버거메뉴 나오기
-    hamburger = (ImageButton) findViewById(R.id.hamButton);
-    hamburger.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View view) {
-        drawerLayout = (DrawerLayout) findViewById(R.id.memo_draw);
-        if (!drawerLayout.isDrawerOpen(Gravity.LEFT)) {
-          getData(auth_token);
-          drawerLayout.openDrawer(Gravity.LEFT);
-        }
-      }
-    });
-    // 햄버거 메뉴 플러스 버튼
-    addFolder = (ImageButton) findViewById(R.id.addFolder);
-    addFolder.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View view) {
-        addDialog(auth_token);
-      }
-    });
-    listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-      @Override
-      public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-        Toast.makeText(MemoActivity.this, "폴더클릭"+adapter.getFolderName(i), Toast.LENGTH_SHORT).show();
-        drawerLayout.closeDrawer(Gravity.LEFT);
-      }
-    });
-    listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-      @Override
-      public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
-        deleteDialog(i,auth_token);
-        return false;
-      }
-    });
+    // Hamburger Menu
+    service = ServiceGenerator.createService(NotebookService.class,token);
+    listView = findViewById(R.id.listview);
+    getData(token);
 
-    favorite = (LinearLayout) findViewById(R.id.favorite);
-    recycle = (LinearLayout) findViewById(R.id.recycle);
-    favorite.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View view) {
-        Toast.makeText(MemoActivity.this,"favorite 클릭",Toast.LENGTH_SHORT).show();
-        drawerLayout.closeDrawer(Gravity.LEFT);
-      }
-    });
-    recycle.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View view) {
-        Toast.makeText(MemoActivity.this, "recycle 클릭", Toast.LENGTH_SHORT).show();
-        drawerLayout.closeDrawer(Gravity.LEFT);
-      }
-    });
+    addDialog = new Dialog(MemoActivity.this);
+    addDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+    addDialog.setContentView(R.layout.hamburger_add_dialog);
+    deleteDialog = new Dialog(MemoActivity.this);
+    deleteDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+    deleteDialog.setContentView(R.layout.hamburger_delete_dialog);
+
+    //햄버거메뉴 나오기
+    hamburger = findViewById(R.id.hamButton);
+    hamburger.setOnClickListener(hamburgerMenu);
+
+    // 햄버거 메뉴 플러스 버튼
+    ImageButton addFolder = findViewById(R.id.addFolder);
+    addFolder.setOnClickListener(addFolderClickEvent);
+
+    // Hamburger Menu All note view Button
+    LinearLayout all_notes = findViewById(R.id.all_notes);
+    all_notes.setOnClickListener(noteListClickListener);
+
+    // Hamburger Menu Folder Item Click Event
+    listView.setOnItemClickListener(folderItemClickEvent);
+    listView.setOnItemLongClickListener(folderItemLongClickEvent);
+
+    LinearLayout favorite = findViewById(R.id.favorite);
+    favorite.setOnClickListener(favoriteNoteListClickListener);
 
   }
+
+  // All Note List View Button Click Event
+  private final View.OnClickListener noteListClickListener = view -> {
+    Intent intent = new Intent(getApplicationContext(), NoteListActivity.class);
+    startActivity(intent);
+  };
+
+  // Favorite Note List View Button Click Event
+  private final View.OnClickListener favoriteNoteListClickListener = view -> {
+    Intent intent = new Intent(getApplicationContext(), NoteListActivity.class);
+    intent.putExtra("NotebookTitle", "favorite");
+    startActivity(intent);
+  };
+
+  // Bottom Menu Home Button Click Event
+  private final View.OnClickListener homeClickListener = view -> {
+    Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
+    startActivity(intent);
+  };
+
+  // Bottom Menu My Page Button Click Event
+  private final View.OnClickListener myPageClickListener = view -> {
+    Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
+    startActivity(intent);
+  };
+
+  // Hamburger Menu 나오기
+  @SuppressLint("RtlHardcoded")
+  private final View.OnClickListener hamburgerMenu = view -> {
+    DrawerLayout drawerLayout = findViewById(R.id.memo_draw);
+    if (!drawerLayout.isDrawerOpen(Gravity.LEFT)) {
+      getData(token);
+      drawerLayout.openDrawer(Gravity.LEFT);
+    }
+  };
+
+  // Add Folder Click Event
+  private final View.OnClickListener addFolderClickEvent = view -> {
+    addDialog(token);
+  };
+
+  // Folder Item Click Event
+  @SuppressLint("RtlHardcoded")
+  private final AdapterView.OnItemClickListener folderItemClickEvent = (adapterView, view, i, l) ->  {
+    Intent intent = new Intent(getApplicationContext(), NoteListActivity.class);
+    intent.putExtra("NotebookTitle", adapter.getFolderName(i));
+    startActivity(intent);
+  };
+
+  // Folder Item Long Click Event
+  private final AdapterView.OnItemLongClickListener folderItemLongClickEvent = (adapterView, view, i, l) -> {
+    deleteDialog(i,token);
+    return false;
+  };
+
   // 폴더 추가
-  public void addDialog(String auth_token) {
+  public void addDialog(String token) {
     addDialog.show();
     addDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
@@ -156,53 +185,34 @@ public class MemoActivity extends AppCompatActivity {
     create = addDialog.findViewById(R.id.create);
 
 
-    cancel.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View view) {
-        addDialog.dismiss();
-      }
-    });
+    cancel.setOnClickListener(view -> addDialog.dismiss());
 
-    create.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View view) {
-        String text = folderName.getText().toString();
-        NotebookRequest request = new NotebookRequest(text);
-        adapter.addItem(request);
-        folderName.setText("");
-        addDialog.dismiss();
-        getData(auth_token);
-        //adapter.notifyDataSetChanged();
-      }
+    create.setOnClickListener(view -> {
+      String text = folderName.getText().toString();
+      NotebookRequest request = new NotebookRequest(text);
+      adapter.addItem(request);
+      folderName.setText("");
+      addDialog.dismiss();
+      getData(token);
     });
   }
   // 폴더 삭제
   public void deleteDialog(int i,String auth_token) {
-    String text = adapter.getFolderName(i).toString();
+    String text = adapter.getFolderName(i);
     deleteDialog.show();
     deleteDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
     Button cancel = deleteDialog.findViewById(R.id.button2);
-    cancel.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View view) {
-        deleteDialog.dismiss();
-      }
-    });
+    cancel.setOnClickListener(view -> deleteDialog.dismiss());
     Button delete = deleteDialog.findViewById(R.id.button3);
-    delete.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View view) {
-        Log.d("notebooks delete",text);
-        adapter.remove(i);
-        deleteDialog.dismiss();
-        getData(auth_token);
-        //adapter.notifyDataSetChanged();
-      }
+    delete.setOnClickListener(view -> {
+      Log.d("notebooks delete",text);
+      adapter.remove(i);
+      deleteDialog.dismiss();
+      getData(auth_token);
     });
   }
   // 햄버거메뉴 폴더 리스트 가져오기
   public void getData(String token) {
-    //listView = (ListView) findViewById(R.id.listview);
     service.getNotebooks().enqueue(new Callback<List<Notebook>>() {
       @Override
       public void onResponse(Call<List<Notebook>> call, Response<List<Notebook>> response) {
