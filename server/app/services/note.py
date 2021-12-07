@@ -1,6 +1,7 @@
 from typing import Any, List
 from uuid import UUID
 
+from krwordrank.sentence import summarize_with_sentences
 from sqlalchemy.orm import Session
 
 from .. import services
@@ -25,8 +26,6 @@ class NoteService(Service[Note, NoteCreate, NoteUpdate]):
                 object_in=NotebookCreate(name=note_data["notebook"]),
                 user_id=user_id,
             )
-        print(notebook.name, notebook.id)
-        print(note_data)
 
         note = Note(
             **NoteInDBBase(
@@ -50,6 +49,25 @@ class NoteService(Service[Note, NoteCreate, NoteUpdate]):
             .offset(offset)
             .all()
         )
+
+    def summarize_note(self, db: Session, model: Note, texts: str) -> None:
+        lines = texts.splitlines()
+        if lines:
+            try:
+                _, sentences = summarize_with_sentences(
+                    lines, diversity=0.5, num_keywords=3, num_keysents=3, verbose=True
+                )
+                print(lines)
+                print()
+                print(sentences)
+                model.summary = "\n".join(sentences)  # type: ignore
+                db.add(model)
+                db.commit()
+            except Exception as e:
+                print(e)
+                model.summary = "No summarized sentences"  # type: ignore
+                db.add(model)
+                db.commit()
 
 
 note = NoteService(Note)

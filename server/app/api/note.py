@@ -1,7 +1,7 @@
 from typing import Any, List
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from database.session import get_db
@@ -29,15 +29,17 @@ def read_notes_by_user(
 
 
 @router.post("", response_model=schemas.Note, status_code=status.HTTP_201_CREATED)
-def create_note(
+async def create_note(
     *,
     db: Session = Depends(get_db),
     note_in: schemas.NoteCreate,
     current_user: models.User = Depends(services.get_current_user),
+    background_tasks: BackgroundTasks,
 ) -> Any:
     note = services.note.create_with_user(
         db, object_in=note_in, user_id=current_user.id  # type: ignore
     )
+    background_tasks.add_task(services.note.summarize_note, db, note, note_in.content)
     return note
 
 
