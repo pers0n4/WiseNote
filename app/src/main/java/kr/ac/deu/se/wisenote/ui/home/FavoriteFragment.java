@@ -11,7 +11,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import kr.ac.deu.se.wisenote.R;
@@ -37,7 +36,6 @@ public class FavoriteFragment extends Fragment {
     View view = inflater.inflate(R.layout.fragment_favorite, container, false);
     adapter = new GridViewAdapter();
     gridView = view.findViewById(R.id.gridview);
-    ArrayList<Note> itemList = new ArrayList<>();
 
     service = ServiceGenerator.createService(NoteService.class, token);
     Call<List<Note>> note = service.getNotes();
@@ -47,12 +45,12 @@ public class FavoriteFragment extends Fragment {
       public void onResponse(Call<List<Note>> call, Response<List<Note>> response) {
         if(response.isSuccessful()) {
           List<Note> notes = response.body();
-          itemList.addAll(notes);
-          adapter.replace(itemList);
-          adapter.notifyDataSetChanged();
-        }
-        else {
-          Log.d("notes", response.errorBody().string());
+          for(Note note : notes) {
+            if(note.getIs_favorite()) {
+              adapter.addItem(note);
+              adapter.notifyDataSetChanged();
+            }
+          }
         }
       }
 
