@@ -34,6 +34,7 @@ import kr.ac.deu.se.wisenote.service.NotebookService;
 import kr.ac.deu.se.wisenote.service.ServiceGenerator;
 import kr.ac.deu.se.wisenote.ui.hamburger.HamburgerListAdapter;
 import kr.ac.deu.se.wisenote.ui.home.HomeActivity;
+import kr.ac.deu.se.wisenote.ui.memo.MemoActivity;
 import kr.ac.deu.se.wisenote.vo.note.Note;
 import kr.ac.deu.se.wisenote.vo.notebooks.Notebook;
 import kr.ac.deu.se.wisenote.vo.notebooks.NotebookRequest;
@@ -88,6 +89,8 @@ public class NoteListActivity extends AppCompatActivity {
     }
 
     noteListView.setAdapter(noteListViewAdapter);
+
+    noteListView.setOnItemClickListener(noteItemClickEvent);
 
     // 햄버거 메뉴 생성
     service = ServiceGenerator.createService(NotebookService.class,token);
@@ -203,6 +206,15 @@ public class NoteListActivity extends AppCompatActivity {
     tv_title.setText(title);
     tv_description.setText(description);
   }
+
+  // Folder Item Click Event
+  @SuppressLint("RtlHardcoded")
+  private final AdapterView.OnItemClickListener noteItemClickEvent = (adapterView, view, i, l) ->  {
+    Intent intent = new Intent(getApplicationContext(), MemoActivity.class);
+    Note getItem = noteListViewAdapter.getItem(i);
+    intent.putExtra("NoteId", getItem.getId());
+    startActivity(intent);
+  };
 
   // All Note List View Button Click Event
   private final View.OnClickListener noteListClickListener = view -> {
