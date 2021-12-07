@@ -5,6 +5,12 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
 
     <application
         android:allowBackup="true"
@@ -14,7 +20,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.WiseNote"
         android:usesCleartextTraffic="true"
+        android:requestLegacyExternalStorage="true"
         >
+        <meta-data
+            android:name="con.naver.maps.map.CLIENT_ID"
+            android:value="n232dihxga"/>
         <activity
             android:name=".StartActivity"
             android:exported="true">
@@ -28,6 +38,14 @@
         <activity android:name=".ui.sign.SigninActivity" />
         <activity android:name=".ui.sign.SignupActivity" />
         <activity android:name=".ui.home.HomeActivity" />
+        <activity android:name=".ui.mypage.MyPageActivity"/>
+        <activity android:name=".ui.record.RecordActivity"/>
+        <activity android:name=".ui.note.NoteActivity"/>
     </application>
-
+    <queries>
+        <intent>
+            <action
+                android:name="android.speech.RecognitionService" />
+        </intent>
+    </queries>
 </manifest>
