@@ -41,6 +41,8 @@
         <activity android:name=".ui.mypage.MyPageActivity"/>
         <activity android:name=".ui.record.RecordActivity"/>
         <activity android:name=".ui.note.NoteActivity"/>
+        <activity android:name=".ui.notelist.NoteListActivity" />
+        <activity android:name=".ui.memo.MemoActivity"/>
     </application>
     <queries>
         <intent>

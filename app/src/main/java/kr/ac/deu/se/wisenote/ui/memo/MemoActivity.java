@@ -1,6 +1,5 @@
-package kr.ac.deu.se.wisenote.ui.home;
+package kr.ac.deu.se.wisenote.ui.memo;
 
-import android.content.Intent;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Context;
@@ -9,7 +8,6 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.view.View;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -20,7 +18,6 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -34,10 +31,11 @@ import com.google.android.material.tabs.TabLayoutMediator;
 import java.util.List;
 
 import kr.ac.deu.se.wisenote.R;
-import kr.ac.deu.se.wisenote.ui.record.RecordActivity;
 import kr.ac.deu.se.wisenote.service.NotebookService;
 import kr.ac.deu.se.wisenote.service.ServiceGenerator;
 import kr.ac.deu.se.wisenote.ui.hamburger.HamburgerListAdapter;
+import kr.ac.deu.se.wisenote.ui.home.HomeActivity;
+import kr.ac.deu.se.wisenote.ui.home.ViewPagerAdapter;
 import kr.ac.deu.se.wisenote.ui.notelist.NoteListActivity;
 import kr.ac.deu.se.wisenote.vo.notebooks.Notebook;
 import kr.ac.deu.se.wisenote.vo.notebooks.NotebookRequest;
@@ -45,7 +43,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class HomeActivity extends AppCompatActivity {
+public class MemoActivity extends AppCompatActivity {
   private ListView listView;
   private List<Notebook> notebooks;
   private NotebookService service;
@@ -54,13 +52,13 @@ public class HomeActivity extends AppCompatActivity {
   private Dialog deleteDialog;
   private EditText folderName;
 
-  private final String[] titles = new String[]{"Favorite", "Recent", "Map"};
+  private final String[] titles = new String[]{"Main","Text","Memo"};
   private String token;
 
   @Override
   protected void onCreate(@Nullable Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    setContentView(R.layout.activity_home);
+    setContentView(R.layout.activity_memo);
 
     // token 정보 가져오기
     SharedPreferences sharedPref = getSharedPreferences("wisenote", Context.MODE_PRIVATE);
@@ -72,42 +70,35 @@ public class HomeActivity extends AppCompatActivity {
     ImageButton my_page_button = findViewById(R.id.mypage_button);
     my_page_button.setOnClickListener(myPageClickListener);
 
-    // 탭 뷰 옆 모든 노트 목록 확인 버튼
-    TextView tv_notelist = findViewById(R.id.note_list_button);
-    tv_notelist.setOnClickListener(noteListClickListener);
-
-    // ViewPager 설정
-    ViewPager2 viewPager = findViewById(R.id.view_pager);
+    ViewPager2 viewPager = findViewById(R.id.view_pager_memo);
     viewPager.setOffscreenPageLimit(3);
 
-    // Fragment 생성
-    Fragment favoriteFragment = new FavoriteFragment(token);
-    Fragment recentFragment = new RecentFragment(token);
-    Fragment mapFragment = new MapFragment();
+    Fragment memoFragment = new MemoFragment();
+    Fragment textFragment = new TextFragment();
+    Fragment mainFragment = new MainFragment();
 
-    // ViewPagerAdapter 를 이용하여 Fragment 연결
     ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(this);
-    viewPagerAdapter.addFragment(favoriteFragment);
-    viewPagerAdapter.addFragment(recentFragment);
-    viewPagerAdapter.addFragment(mapFragment);
+    viewPagerAdapter.addFragment(mainFragment);
+    viewPagerAdapter.addFragment(textFragment);
+    viewPagerAdapter.addFragment(memoFragment);
     viewPager.setAdapter(viewPagerAdapter);
 
-    // TabLayout 에 ViewPager 연결
-    TabLayout tabLayout = findViewById(R.id.tabs);
-    new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> tab.setText(titles[position])).attach();
+    TabLayout tabLayout = findViewById(R.id.tabs_memo);
+    new TabLayoutMediator(tabLayout,viewPager,(tab, position) -> tab.setText(titles[position])).attach();
 
+    // Hamburger Menu
     service = ServiceGenerator.createService(NotebookService.class,token);
     listView = findViewById(R.id.listview);
     getData(token);
-    //dialog 초기화
-    addDialog = new Dialog(HomeActivity.this);
+
+    addDialog = new Dialog(MemoActivity.this);
     addDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
     addDialog.setContentView(R.layout.hamburger_add_dialog);
-    deleteDialog = new Dialog(HomeActivity.this);
+    deleteDialog = new Dialog(MemoActivity.this);
     deleteDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
     deleteDialog.setContentView(R.layout.hamburger_delete_dialog);
 
-    // 햄버거메뉴 나오기
+    //햄버거메뉴 나오기
     ImageButton hamburger = findViewById(R.id.hamButton);
     hamburger.setOnClickListener(hamburgerMenu);
 
@@ -125,6 +116,7 @@ public class HomeActivity extends AppCompatActivity {
 
     LinearLayout favorite = findViewById(R.id.favorite);
     favorite.setOnClickListener(favoriteNoteListClickListener);
+
   }
 
   // All Note List View Button Click Event
@@ -155,7 +147,7 @@ public class HomeActivity extends AppCompatActivity {
   // Hamburger Menu 나오기
   @SuppressLint("RtlHardcoded")
   private final View.OnClickListener hamburgerMenu = view -> {
-    DrawerLayout drawerLayout = findViewById(R.id.home_draw);
+    DrawerLayout drawerLayout = findViewById(R.id.memo_draw);
     if (!drawerLayout.isDrawerOpen(Gravity.LEFT)) {
       getData(token);
       drawerLayout.openDrawer(Gravity.LEFT);
@@ -186,9 +178,11 @@ public class HomeActivity extends AppCompatActivity {
     addDialog.show();
     addDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
+
     folderName = addDialog.findViewById(R.id.editText);
     Button cancel = addDialog.findViewById(R.id.cancel);
     Button create = addDialog.findViewById(R.id.create);
+
 
     cancel.setOnClickListener(view -> addDialog.dismiss());
 
@@ -199,10 +193,8 @@ public class HomeActivity extends AppCompatActivity {
       folderName.setText("");
       addDialog.dismiss();
       getData(token);
-      adapter.notifyDataSetChanged();
     });
   }
-
   // 폴더 삭제
   public void deleteDialog(int i,String auth_token) {
     String text = adapter.getFolderName(i);
@@ -216,10 +208,8 @@ public class HomeActivity extends AppCompatActivity {
       adapter.remove(i);
       deleteDialog.dismiss();
       getData(auth_token);
-      adapter.notifyDataSetChanged();
     });
   }
-
   // 햄버거메뉴 폴더 리스트 가져오기
   public void getData(String token) {
     service.getNotebooks().enqueue(new Callback<List<Notebook>>() {
@@ -235,25 +225,6 @@ public class HomeActivity extends AppCompatActivity {
 
       }
     });
-
-    Intent intent = getIntent();
-    id=intent.getStringExtra("아이디");
-
-    findViewById(R.id.MyPage_btn).setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        Intent intent = new Intent(kr.ac.deu.se.wisenote.ui.home.HomeActivity.this, kr.ac.deu.se.wisenote.ui.mypage.MyPageActivity.class);
-        intent.putExtra("아이디",id);
-        startActivity(intent);
-      }
-    });
-    findViewById(R.id.Record_btn).setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        Intent intent = new Intent(kr.ac.deu.se.wisenote.ui.home.HomeActivity.this, RecordActivity.class);
-        intent.putExtra("아이디",id);
-        startActivity(intent);
-      }
-    });
   }
+
 }

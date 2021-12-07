@@ -5,14 +5,15 @@
     android:orientation="horizontal">
 
     <ImageButton
+        android:id="@+id/hamButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_weight="1"
+        android:backgroundTint="#FFFFFF"
+        android:contentDescription="@string/menu_icon_description"
         android:maxWidth="20dp"
         android:maxHeight="20dp"
-        android:src="@drawable/icon_menu"
-        android:backgroundTint="#FFFFFF"
-        android:contentDescription="@string/menu_icon_description" />
+        android:src="@drawable/icon_menu" />
 
     <TextView
         android:layout_width="wrap_content"

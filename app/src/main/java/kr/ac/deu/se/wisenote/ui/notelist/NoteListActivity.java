@@ -1,6 +1,5 @@
-package kr.ac.deu.se.wisenote.ui.home;
+package kr.ac.deu.se.wisenote.ui.notelist;
 
-import android.content.Intent;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Context;
@@ -9,7 +8,7 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.view.View;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -25,27 +24,26 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.fragment.app.Fragment;
-import androidx.viewpager2.widget.ViewPager2;
 
-import com.google.android.material.tabs.TabLayout;
-import com.google.android.material.tabs.TabLayoutMediator;
-
+import java.util.ArrayList;
 import java.util.List;
 
 import kr.ac.deu.se.wisenote.R;
-import kr.ac.deu.se.wisenote.ui.record.RecordActivity;
+import kr.ac.deu.se.wisenote.service.NoteService;
 import kr.ac.deu.se.wisenote.service.NotebookService;
 import kr.ac.deu.se.wisenote.service.ServiceGenerator;
 import kr.ac.deu.se.wisenote.ui.hamburger.HamburgerListAdapter;
-import kr.ac.deu.se.wisenote.ui.notelist.NoteListActivity;
+import kr.ac.deu.se.wisenote.ui.home.HomeActivity;
+import kr.ac.deu.se.wisenote.ui.memo.MemoActivity;
+import kr.ac.deu.se.wisenote.vo.note.Note;
 import kr.ac.deu.se.wisenote.vo.notebooks.Notebook;
 import kr.ac.deu.se.wisenote.vo.notebooks.NotebookRequest;
+import lombok.SneakyThrows;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class HomeActivity extends AppCompatActivity {
+public class NoteListActivity extends AppCompatActivity {
   private ListView listView;
   private List<Notebook> notebooks;
   private NotebookService service;
@@ -54,13 +52,15 @@ public class HomeActivity extends AppCompatActivity {
   private Dialog deleteDialog;
   private EditText folderName;
 
-  private final String[] titles = new String[]{"Favorite", "Recent", "Map"};
+  private NoteListViewAdapter noteListViewAdapter;
+  private TextView tv_title;
+  private TextView tv_description;
   private String token;
 
   @Override
   protected void onCreate(@Nullable Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    setContentView(R.layout.activity_home);
+    setContentView(R.layout.activity_note_list);
 
     // token 정보 가져오기
     SharedPreferences sharedPref = getSharedPreferences("wisenote", Context.MODE_PRIVATE);
@@ -72,38 +72,35 @@ public class HomeActivity extends AppCompatActivity {
     ImageButton my_page_button = findViewById(R.id.mypage_button);
     my_page_button.setOnClickListener(myPageClickListener);
 
-    // 탭 뷰 옆 모든 노트 목록 확인 버튼
-    TextView tv_notelist = findViewById(R.id.note_list_button);
-    tv_notelist.setOnClickListener(noteListClickListener);
+    tv_title = findViewById(R.id.notebook_title);
+    tv_description = findViewById(R.id.notebook_description);
 
-    // ViewPager 설정
-    ViewPager2 viewPager = findViewById(R.id.view_pager);
-    viewPager.setOffscreenPageLimit(3);
+    noteListViewAdapter = new NoteListViewAdapter();
+    ListView noteListView = findViewById(R.id.note_list_view);
 
-    // Fragment 생성
-    Fragment favoriteFragment = new FavoriteFragment(token);
-    Fragment recentFragment = new RecentFragment(token);
-    Fragment mapFragment = new MapFragment();
+    // 전달 정보에 따른 노트 생성
+    Intent intent = getIntent();
+    if (!TextUtils.isEmpty(intent.getStringExtra("NotebookTitle"))) {
+      getNoteInfo(intent.getStringExtra("NotebookTitle"));
+    } else {
+      setTextView("All Notes", "Every notes you wrote.");
+      // 모든 노트에 대한 목록 생성
+      getNoteInfo();
+    }
 
-    // ViewPagerAdapter 를 이용하여 Fragment 연결
-    ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(this);
-    viewPagerAdapter.addFragment(favoriteFragment);
-    viewPagerAdapter.addFragment(recentFragment);
-    viewPagerAdapter.addFragment(mapFragment);
-    viewPager.setAdapter(viewPagerAdapter);
+    noteListView.setAdapter(noteListViewAdapter);
 
-    // TabLayout 에 ViewPager 연결
-    TabLayout tabLayout = findViewById(R.id.tabs);
-    new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> tab.setText(titles[position])).attach();
+    noteListView.setOnItemClickListener(noteItemClickEvent);
 
+    // 햄버거 메뉴 생성
     service = ServiceGenerator.createService(NotebookService.class,token);
     listView = findViewById(R.id.listview);
     getData(token);
     //dialog 초기화
-    addDialog = new Dialog(HomeActivity.this);
+    addDialog = new Dialog(NoteListActivity.this);
     addDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
     addDialog.setContentView(R.layout.hamburger_add_dialog);
-    deleteDialog = new Dialog(HomeActivity.this);
+    deleteDialog = new Dialog(NoteListActivity.this);
     deleteDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
     deleteDialog.setContentView(R.layout.hamburger_delete_dialog);
 
@@ -127,6 +124,98 @@ public class HomeActivity extends AppCompatActivity {
     favorite.setOnClickListener(favoriteNoteListClickListener);
   }
 
+  // Get All Note Information
+  private void getNoteInfo() {
+    NoteService service = ServiceGenerator.createService(NoteService.class, token);
+    Call<List<Note>> note = service.getNotes();
+    note.enqueue(new Callback<List<Note>>() {
+      @SneakyThrows
+      @Override
+      public void onResponse(Call<List<Note>> call, Response<List<Note>> response) {
+        if(response.isSuccessful()) {
+          List<Note> notes = response.body();
+          ArrayList<Note> itemList = new ArrayList<>();
+          itemList.addAll(notes);
+          noteListViewAdapter.replace(itemList);
+          noteListViewAdapter.notifyDataSetChanged();
+        }
+        else {
+          Log.d("notes", response.errorBody().string());
+        }
+      }
+
+      @Override
+      public void onFailure(Call<List<Note>> call, Throwable t) {
+        Log.d("fail", t.getCause().toString());
+      }
+    });
+  }
+
+  // Get Note Information By Note Name
+  private void getNoteInfo(String notebook_name) {
+    if (notebook_name.equals("favorite")) {
+      setTextView("Favorite", "Favorite notes you wrote.");
+      NoteService service = ServiceGenerator.createService(NoteService.class, token);
+      Call<List<Note>> note = service.getNotes();
+      note.enqueue(new Callback<List<Note>>() {
+        @SneakyThrows
+        @Override
+        public void onResponse(Call<List<Note>> call, Response<List<Note>> response) {
+          if(response.isSuccessful()) {
+            List<Note> notes = response.body();
+            for(Note note : notes) {
+              if(note.getIs_favorite()) {
+                noteListViewAdapter.addItem(note);
+                noteListViewAdapter.notifyDataSetChanged();
+              }
+            }
+          }
+        }
+
+        @Override
+        public void onFailure(Call<List<Note>> call, Throwable t) {
+          Log.d("fail", t.getCause().toString());
+        }
+      });
+    } else {
+      NotebookService service = ServiceGenerator.createService(NotebookService.class, token);
+      Call<Notebook> notebook = service.readNotebook(notebook_name);
+      notebook.enqueue(new Callback<Notebook>() {
+        @Override
+        public void onResponse(Call<Notebook> call, Response<Notebook> response) {
+          if(response.isSuccessful()) {
+            Notebook data = response.body();
+            setTextView(data.getName(), "The notes that you want");
+            ArrayList<Note> itemList = new ArrayList<>();
+            itemList.addAll(data.getNotes());
+            noteListViewAdapter.replace(itemList);
+            noteListViewAdapter.notifyDataSetChanged();
+          }
+        }
+
+        @Override
+        public void onFailure(Call<Notebook> call, Throwable t) {
+          Log.d("fail", t.getCause().toString());
+        }
+      });
+    }
+  }
+
+  // Edit Notebook List View Title
+  private void setTextView(String title, String description) {
+    tv_title.setText(title);
+    tv_description.setText(description);
+  }
+
+  // Folder Item Click Event
+  @SuppressLint("RtlHardcoded")
+  private final AdapterView.OnItemClickListener noteItemClickEvent = (adapterView, view, i, l) ->  {
+    Intent intent = new Intent(getApplicationContext(), MemoActivity.class);
+    Note getItem = noteListViewAdapter.getItem(i);
+    intent.putExtra("NoteId", getItem.getId());
+    startActivity(intent);
+  };
+
   // All Note List View Button Click Event
   private final View.OnClickListener noteListClickListener = view -> {
     Intent intent = new Intent(getApplicationContext(), NoteListActivity.class);
@@ -141,13 +230,13 @@ public class HomeActivity extends AppCompatActivity {
   };
 
   // Bottom Menu Home Button Click Event
-  private final View.OnClickListener homeClickListener = view -> {
+  private View.OnClickListener homeClickListener = view -> {
     Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
     startActivity(intent);
   };
 
   // Bottom Menu My Page Button Click Event
-  private final View.OnClickListener myPageClickListener = view -> {
+  private View.OnClickListener myPageClickListener = view -> {
     Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
     startActivity(intent);
   };
@@ -155,7 +244,7 @@ public class HomeActivity extends AppCompatActivity {
   // Hamburger Menu 나오기
   @SuppressLint("RtlHardcoded")
   private final View.OnClickListener hamburgerMenu = view -> {
-    DrawerLayout drawerLayout = findViewById(R.id.home_draw);
+    DrawerLayout drawerLayout = findViewById(R.id.note_list_draw);
     if (!drawerLayout.isDrawerOpen(Gravity.LEFT)) {
       getData(token);
       drawerLayout.openDrawer(Gravity.LEFT);
@@ -233,26 +322,6 @@ public class HomeActivity extends AppCompatActivity {
       @Override
       public void onFailure(Call<List<Notebook>> call, Throwable t) {
 
-      }
-    });
-
-    Intent intent = getIntent();
-    id=intent.getStringExtra("아이디");
-
-    findViewById(R.id.MyPage_btn).setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        Intent intent = new Intent(kr.ac.deu.se.wisenote.ui.home.HomeActivity.this, kr.ac.deu.se.wisenote.ui.mypage.MyPageActivity.class);
-        intent.putExtra("아이디",id);
-        startActivity(intent);
-      }
-    });
-    findViewById(R.id.Record_btn).setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        Intent intent = new Intent(kr.ac.deu.se.wisenote.ui.home.HomeActivity.this, RecordActivity.class);
-        intent.putExtra("아이디",id);
-        startActivity(intent);
       }
     });
   }

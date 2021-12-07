@@ -40,7 +40,7 @@ def get_password_hash(password: str) -> str:
     return pwd_context.hash(password)
 
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/token")
 
 
 def get_current_user(
