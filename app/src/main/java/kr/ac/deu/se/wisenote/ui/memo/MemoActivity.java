@@ -36,7 +36,9 @@ import kr.ac.deu.se.wisenote.service.ServiceGenerator;
 import kr.ac.deu.se.wisenote.ui.hamburger.HamburgerListAdapter;
 import kr.ac.deu.se.wisenote.ui.home.HomeActivity;
 import kr.ac.deu.se.wisenote.ui.home.ViewPagerAdapter;
+import kr.ac.deu.se.wisenote.ui.mypage.MyPageActivity;
 import kr.ac.deu.se.wisenote.ui.notelist.NoteListActivity;
+import kr.ac.deu.se.wisenote.ui.record.RecordActivity;
 import kr.ac.deu.se.wisenote.vo.notebooks.Notebook;
 import kr.ac.deu.se.wisenote.vo.notebooks.NotebookRequest;
 import retrofit2.Call;
@@ -69,6 +71,8 @@ public class MemoActivity extends AppCompatActivity {
     home_button.setOnClickListener(homeClickListener);
     ImageButton my_page_button = findViewById(R.id.mypage_button);
     my_page_button.setOnClickListener(myPageClickListener);
+    ImageButton record_button = findViewById(R.id.Record_btn);
+    record_button.setOnClickListener(recordClickListener);
 
     ViewPager2 viewPager = findViewById(R.id.view_pager_memo);
     viewPager.setOffscreenPageLimit(3);
@@ -140,7 +144,15 @@ public class MemoActivity extends AppCompatActivity {
 
   // Bottom Menu My Page Button Click Event
   private final View.OnClickListener myPageClickListener = view -> {
-    Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
+    Intent intent = new Intent(getApplicationContext(), MyPageActivity.class);
+    intent.putExtra("token",token);
+    startActivity(intent);
+  };
+
+  // Bottom Menu record Button Click Event
+  private final View.OnClickListener recordClickListener = view -> {
+    Intent intent = new Intent(getApplicationContext(), RecordActivity.class);
+    intent.putExtra("token",token);
     startActivity(intent);
   };
 
