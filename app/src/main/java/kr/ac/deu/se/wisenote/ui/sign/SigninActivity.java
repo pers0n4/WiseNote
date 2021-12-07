@@ -67,6 +67,7 @@ public class SigninActivity extends AppCompatActivity{
           editor.commit();
 
           Intent intent = new Intent(SigninActivity.this, HomeActivity.class);
+          intent.putExtra("아이디",result.getAccess_token());
           intent.putExtra("token",result.getAccess_token());
           startActivity(intent);
         }else if(response.code() == 401){
