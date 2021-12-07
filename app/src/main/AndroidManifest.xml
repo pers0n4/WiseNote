@@ -22,9 +22,12 @@
         android:usesCleartextTraffic="true"
         android:requestLegacyExternalStorage="true"
         >
+
         <meta-data
-            android:name="con.naver.maps.map.CLIENT_ID"
-            android:value="n232dihxga"/>
+            android:name="com.google.android.geo.API_KEY"
+            android:value="${MAPS_API_KEY}"/>
+
+
         <activity
             android:name=".StartActivity"
             android:exported="true">
@@ -40,7 +43,6 @@
         <activity android:name=".ui.home.HomeActivity" />
         <activity android:name=".ui.mypage.MyPageActivity"/>
         <activity android:name=".ui.record.RecordActivity"/>
-        <activity android:name=".ui.note.NoteActivity"/>
         <activity android:name=".ui.notelist.NoteListActivity" />
         <activity android:name=".ui.memo.MemoActivity"/>
     </application>
