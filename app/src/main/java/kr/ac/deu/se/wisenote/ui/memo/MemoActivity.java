@@ -85,6 +85,9 @@ public class MemoActivity extends AppCompatActivity {
     SharedPreferences sharedPref = getSharedPreferences("wisenote", Context.MODE_PRIVATE);
     token = sharedPref.getString("token", null);
 
+    Intent intent = getIntent();
+    String noteId = intent.getStringExtra("NoteId");
+
     // 하단 navigation button 구현
     ImageButton home_button = findViewById(R.id.home_button);
     home_button.setOnClickListener(homeClickListener);
@@ -113,8 +116,6 @@ public class MemoActivity extends AppCompatActivity {
     getData(token);
 
     noteService = ServiceGenerator.createService(NoteService.class,token);
-    Intent intent = getIntent();
-    String noteId = intent.getStringExtra("notdId");
 
     getNote(noteId);
 

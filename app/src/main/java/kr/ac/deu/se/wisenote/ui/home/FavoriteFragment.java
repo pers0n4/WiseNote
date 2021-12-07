@@ -19,6 +19,7 @@ import java.util.List;
 import kr.ac.deu.se.wisenote.R;
 import kr.ac.deu.se.wisenote.service.NoteService;
 import kr.ac.deu.se.wisenote.service.ServiceGenerator;
+import kr.ac.deu.se.wisenote.ui.memo.MemoActivity;
 import kr.ac.deu.se.wisenote.vo.note.Note;
 import lombok.SneakyThrows;
 import retrofit2.Call;
