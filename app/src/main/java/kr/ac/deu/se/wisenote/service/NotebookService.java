@@ -19,6 +19,9 @@ public interface NotebookService {
   @POST("/notebooks")
   Call<Notebook> createNotebooks(@Body NotebookRequest notebookRequest);
 
+  @GET("/notebooks/{notebook_name}")
+  Call<Notebook> readNotebook(@Path("notebook_name")String notebook_name);
+
   @DELETE("/notebooks/{notebook_name}")
   Call<Void> deleteNotebooks(@Path("notebook_name")String notebook_name );
 

@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -25,7 +26,7 @@ public class MainActivity extends AppCompatActivity
   private final int REQUEST_SPEECH = 1000;
   private Button bt3;
   private View mainLayout;
-
+  String text;
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -69,11 +70,13 @@ public class MainActivity extends AppCompatActivity
       if (resultCode == RESULT_OK && data != null) {
         TextView textView = (TextView) findViewById(R.id.textView);
         textView.setText(data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS).get(0));
+        text=data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS).get(0);
+        Log.d("qwerqwe","auth: 실패, 결과\n");
       }
     }
   }
 
-  private void prepareSpeech() {
+  public void prepareSpeech() {
     if (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
         == PackageManager.PERMISSION_GRANTED) {
       startSpeech();

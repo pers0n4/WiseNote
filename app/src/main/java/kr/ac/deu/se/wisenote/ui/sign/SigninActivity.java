@@ -65,7 +65,10 @@ public class SigninActivity extends AppCompatActivity{
           SharedPreferences.Editor editor = sharedPref.edit();
           editor.putString("token", result.getAccess_token());
           editor.commit();
+
           Intent intent = new Intent(SigninActivity.this, HomeActivity.class);
+          intent.putExtra("아이디",result.getAccess_token());
+          intent.putExtra("token",result.getAccess_token());
           startActivity(intent);
         }else if(response.code() == 401){
           Toast.makeText(SigninActivity.this,"ID 또는 PASSWORD 를 잘못입력하셨습니다.",Toast.LENGTH_SHORT).show();
@@ -77,5 +80,6 @@ public class SigninActivity extends AppCompatActivity{
         t.printStackTrace();
       }
     });
+
   }
 }

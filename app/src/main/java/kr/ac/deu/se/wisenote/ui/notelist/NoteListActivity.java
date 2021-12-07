@@ -1,4 +1,4 @@
-package kr.ac.deu.se.wisenote.ui.memo;
+package kr.ac.deu.se.wisenote.ui.notelist;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
@@ -8,35 +8,25 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.fragment.app.Fragment;
-import androidx.viewpager2.widget.ViewPager2;
 
-import com.google.android.material.tabs.TabLayout;
-import com.google.android.material.tabs.TabLayoutMediator;
-
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 import kr.ac.deu.se.wisenote.R;
 import kr.ac.deu.se.wisenote.service.NoteService;
@@ -44,42 +34,33 @@ import kr.ac.deu.se.wisenote.service.NotebookService;
 import kr.ac.deu.se.wisenote.service.ServiceGenerator;
 import kr.ac.deu.se.wisenote.ui.hamburger.HamburgerListAdapter;
 import kr.ac.deu.se.wisenote.ui.home.HomeActivity;
-import kr.ac.deu.se.wisenote.ui.home.ViewPagerAdapter;
-import kr.ac.deu.se.wisenote.ui.notelist.NoteListActivity;
+import kr.ac.deu.se.wisenote.ui.memo.MemoActivity;
 import kr.ac.deu.se.wisenote.vo.note.Note;
 import kr.ac.deu.se.wisenote.vo.notebooks.Notebook;
 import kr.ac.deu.se.wisenote.vo.notebooks.NotebookRequest;
+import lombok.SneakyThrows;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MemoActivity extends AppCompatActivity {
+public class NoteListActivity extends AppCompatActivity {
   private ListView listView;
   private List<Notebook> notebooks;
-  private TextView title;
-  private TextView date;
-  private LinearLayout setMemo;
-  private Note note;
   private NotebookService service;
   private HamburgerListAdapter adapter;
-  private NoteService noteService;
-  private Button edit;
   private Dialog addDialog;
   private Dialog deleteDialog;
-  private Dialog editDialog;
-  private Button ok;
   private EditText folderName;
-  private EditText editTitle;
 
-  private Spinner spinner;
-
-  private final String[] titles = new String[]{"Main","Text","Memo"};
+  private NoteListViewAdapter noteListViewAdapter;
+  private TextView tv_title;
+  private TextView tv_description;
   private String token;
 
   @Override
   protected void onCreate(@Nullable Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    setContentView(R.layout.activity_memo);
+    setContentView(R.layout.activity_note_list);
 
     // token 정보 가져오기
     SharedPreferences sharedPref = getSharedPreferences("wisenote", Context.MODE_PRIVATE);
@@ -91,47 +72,39 @@ public class MemoActivity extends AppCompatActivity {
     ImageButton my_page_button = findViewById(R.id.mypage_button);
     my_page_button.setOnClickListener(myPageClickListener);
 
-    ViewPager2 viewPager = findViewById(R.id.view_pager_memo);
-    viewPager.setOffscreenPageLimit(3);
+    tv_title = findViewById(R.id.notebook_title);
+    tv_description = findViewById(R.id.notebook_description);
 
-    Fragment memoFragment = new MemoFragment(noteId,token);
-    Fragment textFragment = new TextFragment(noteId,token);
-    Fragment mainFragment = new MainFragment(noteId,token);
+    noteListViewAdapter = new NoteListViewAdapter();
+    ListView noteListView = findViewById(R.id.note_list_view);
 
-    ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(this);
-    viewPagerAdapter.addFragment(mainFragment);
-    viewPagerAdapter.addFragment(textFragment);
-    viewPagerAdapter.addFragment(memoFragment);
-    viewPager.setAdapter(viewPagerAdapter);
+    // 전달 정보에 따른 노트 생성
+    Intent intent = getIntent();
+    if (!TextUtils.isEmpty(intent.getStringExtra("NotebookTitle"))) {
+      getNoteInfo(intent.getStringExtra("NotebookTitle"));
+    } else {
+      setTextView("All Notes", "Every notes you wrote.");
+      // 모든 노트에 대한 목록 생성
+      getNoteInfo();
+    }
 
-    TabLayout tabLayout = findViewById(R.id.tabs_memo);
-    new TabLayoutMediator(tabLayout,viewPager,(tab, position) -> tab.setText(titles[position])).attach();
+    noteListView.setAdapter(noteListViewAdapter);
 
-    // Hamburger Menu
+    noteListView.setOnItemClickListener(noteItemClickEvent);
+
+    // 햄버거 메뉴 생성
     service = ServiceGenerator.createService(NotebookService.class,token);
     listView = findViewById(R.id.listview);
     getData(token);
-
-    noteService = ServiceGenerator.createService(NoteService.class,token);
-    Intent intent = getIntent();
-    String noteId = intent.getStringExtra("notdId");
-
-    getNote(noteId);
-
-    addDialog = new Dialog(MemoActivity.this);
+    //dialog 초기화
+    addDialog = new Dialog(NoteListActivity.this);
     addDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
     addDialog.setContentView(R.layout.hamburger_add_dialog);
-    deleteDialog = new Dialog(MemoActivity.this);
+    deleteDialog = new Dialog(NoteListActivity.this);
     deleteDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
     deleteDialog.setContentView(R.layout.hamburger_delete_dialog);
-    editDialog = new Dialog(MemoActivity.this);
-    editDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-    editDialog.setContentView(R.layout.memo_edit_dialog);
 
-    editTitle = (EditText) editDialog.findViewById(R.id.editNoteTitle);
-    spinner = (Spinner) editDialog.findViewById(R.id.spinner);
-
-    //햄버거메뉴 나오기
+    // 햄버거메뉴 나오기
     ImageButton hamburger = findViewById(R.id.hamButton);
     hamburger.setOnClickListener(hamburgerMenu);
 
@@ -149,73 +122,99 @@ public class MemoActivity extends AppCompatActivity {
 
     LinearLayout favorite = findViewById(R.id.favorite);
     favorite.setOnClickListener(favoriteNoteListClickListener);
-
-    setMemo = (LinearLayout) findViewById(R.id.setMemo);
-    setMemo.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View view) {
-        EditText memo = (EditText) findViewById(R.id.memo);
-        //키보드 내리기
-        InputMethodManager manager = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
-        if(manager.isAcceptingText()){
-          manager.hideSoftInputFromWindow(memo.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-        }
-        memo.clearFocus();
-        String text = memo.getText().toString();
-        note.setMemo(text);
-        Log.d("text",text);
-        noteService.setNote(noteId,note).enqueue(new Callback<Note>() {
-          @Override
-          public void onResponse(Call<Note> call, Response<Note> response) {
-            Log.d("text","code"+ response.code());
-            note = response.body();
-
-          }
-
-          @Override
-          public void onFailure(Call<Note> call, Throwable t) {
-
-          }
-        });
-      }
-    });
-    edit = (Button) findViewById(R.id.edit);
-    edit.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View view) {
-        editDialog(noteId);
-
-      }
-    });
-    ok = (Button)editDialog.findViewById(R.id.ok);
-    ok.setOnClickListener(new View.OnClickListener() {
-      String folderId;
-      Notebook notebook = new Notebook();
-      @Override
-      public void onClick(View view) {
-        notebook = (Notebook) spinner.getSelectedItem();
-        folderId = notebook.getId();
-        note.setTitle(editTitle.getText().toString());
-        note.setNotebook(folderId);
-        Log.d("editFolder","folder id"+ folderId);
-        noteService.setNote(noteId,note).enqueue(new Callback<Note>() {
-          @Override
-          public void onResponse(Call<Note> call, Response<Note> response) {
-            note = response.body();
-            Log.d("editNote","title  :  "+note.getTitle()+"  folderId : "+note.getNotebook_id()+"code:"+response.code());
-            getNote(noteId);
-          }
-
-          @Override
-          public void onFailure(Call<Note> call, Throwable t) {
-
-          }
-        });
-        editDialog.dismiss();
-      }
-    });
-
   }
+
+  // Get All Note Information
+  private void getNoteInfo() {
+    NoteService service = ServiceGenerator.createService(NoteService.class, token);
+    Call<List<Note>> note = service.getNotes();
+    note.enqueue(new Callback<List<Note>>() {
+      @SneakyThrows
+      @Override
+      public void onResponse(Call<List<Note>> call, Response<List<Note>> response) {
+        if(response.isSuccessful()) {
+          List<Note> notes = response.body();
+          ArrayList<Note> itemList = new ArrayList<>();
+          itemList.addAll(notes);
+          noteListViewAdapter.replace(itemList);
+          noteListViewAdapter.notifyDataSetChanged();
+        }
+        else {
+          Log.d("notes", response.errorBody().string());
+        }
+      }
+
+      @Override
+      public void onFailure(Call<List<Note>> call, Throwable t) {
+        Log.d("fail", t.getCause().toString());
+      }
+    });
+  }
+
+  // Get Note Information By Note Name
+  private void getNoteInfo(String notebook_name) {
+    if (notebook_name.equals("favorite")) {
+      setTextView("Favorite", "Favorite notes you wrote.");
+      NoteService service = ServiceGenerator.createService(NoteService.class, token);
+      Call<List<Note>> note = service.getNotes();
+      note.enqueue(new Callback<List<Note>>() {
+        @SneakyThrows
+        @Override
+        public void onResponse(Call<List<Note>> call, Response<List<Note>> response) {
+          if(response.isSuccessful()) {
+            List<Note> notes = response.body();
+            for(Note note : notes) {
+              if(note.getIs_favorite()) {
+                noteListViewAdapter.addItem(note);
+                noteListViewAdapter.notifyDataSetChanged();
+              }
+            }
+          }
+        }
+
+        @Override
+        public void onFailure(Call<List<Note>> call, Throwable t) {
+          Log.d("fail", t.getCause().toString());
+        }
+      });
+    } else {
+      NotebookService service = ServiceGenerator.createService(NotebookService.class, token);
+      Call<Notebook> notebook = service.readNotebook(notebook_name);
+      notebook.enqueue(new Callback<Notebook>() {
+        @Override
+        public void onResponse(Call<Notebook> call, Response<Notebook> response) {
+          if(response.isSuccessful()) {
+            Notebook data = response.body();
+            setTextView(data.getName(), "The notes that you want");
+            ArrayList<Note> itemList = new ArrayList<>();
+            itemList.addAll(data.getNotes());
+            noteListViewAdapter.replace(itemList);
+            noteListViewAdapter.notifyDataSetChanged();
+          }
+        }
+
+        @Override
+        public void onFailure(Call<Notebook> call, Throwable t) {
+          Log.d("fail", t.getCause().toString());
+        }
+      });
+    }
+  }
+
+  // Edit Notebook List View Title
+  private void setTextView(String title, String description) {
+    tv_title.setText(title);
+    tv_description.setText(description);
+  }
+
+  // Folder Item Click Event
+  @SuppressLint("RtlHardcoded")
+  private final AdapterView.OnItemClickListener noteItemClickEvent = (adapterView, view, i, l) ->  {
+    Intent intent = new Intent(getApplicationContext(), MemoActivity.class);
+    Note getItem = noteListViewAdapter.getItem(i);
+    intent.putExtra("NoteId", getItem.getId());
+    startActivity(intent);
+  };
 
   // All Note List View Button Click Event
   private final View.OnClickListener noteListClickListener = view -> {
@@ -231,13 +230,13 @@ public class MemoActivity extends AppCompatActivity {
   };
 
   // Bottom Menu Home Button Click Event
-  private final View.OnClickListener homeClickListener = view -> {
+  private View.OnClickListener homeClickListener = view -> {
     Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
     startActivity(intent);
   };
 
   // Bottom Menu My Page Button Click Event
-  private final View.OnClickListener myPageClickListener = view -> {
+  private View.OnClickListener myPageClickListener = view -> {
     Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
     startActivity(intent);
   };
@@ -245,7 +244,7 @@ public class MemoActivity extends AppCompatActivity {
   // Hamburger Menu 나오기
   @SuppressLint("RtlHardcoded")
   private final View.OnClickListener hamburgerMenu = view -> {
-    DrawerLayout drawerLayout = findViewById(R.id.memo_draw);
+    DrawerLayout drawerLayout = findViewById(R.id.note_list_draw);
     if (!drawerLayout.isDrawerOpen(Gravity.LEFT)) {
       getData(token);
       drawerLayout.openDrawer(Gravity.LEFT);
@@ -276,11 +275,9 @@ public class MemoActivity extends AppCompatActivity {
     addDialog.show();
     addDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
-
     folderName = addDialog.findViewById(R.id.editText);
     Button cancel = addDialog.findViewById(R.id.cancel);
     Button create = addDialog.findViewById(R.id.create);
-
 
     cancel.setOnClickListener(view -> addDialog.dismiss());
 
@@ -291,8 +288,10 @@ public class MemoActivity extends AppCompatActivity {
       folderName.setText("");
       addDialog.dismiss();
       getData(token);
+      adapter.notifyDataSetChanged();
     });
   }
+
   // 폴더 삭제
   public void deleteDialog(int i,String auth_token) {
     String text = adapter.getFolderName(i);
@@ -306,15 +305,10 @@ public class MemoActivity extends AppCompatActivity {
       adapter.remove(i);
       deleteDialog.dismiss();
       getData(auth_token);
+      adapter.notifyDataSetChanged();
     });
   }
-  public void editDialog(String noteid){
-    editDialog.show();
-    editDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-    editTitle.setText(note.getTitle());
-    MemoSpinnerAdapter memoAdapter = new MemoSpinnerAdapter(notebooks);
-    spinner.setAdapter(memoAdapter);
-  }
+
   // 햄버거메뉴 폴더 리스트 가져오기
   public void getData(String token) {
     service.getNotebooks().enqueue(new Callback<List<Notebook>>() {
@@ -331,31 +325,4 @@ public class MemoActivity extends AppCompatActivity {
       }
     });
   }
-  public void getNote(String noteId){
-    noteService.getNote(noteId).enqueue(new Callback<Note>() {
-      @Override
-      public void onResponse(Call<Note> call, Response<Note> response) {
-        note = response.body();
-        Log.d("note","note title:"+note.getTitle());
-        Log.d("note","note title:"+note.getUpdated_at());
-        title = (TextView) findViewById(R.id.textView15);
-        title.setText(note.getTitle());
-
-        date = (TextView) findViewById(R.id.textView16);
-        SimpleDateFormat sdf = new SimpleDateFormat("E, MMM dd, y",new Locale("en", "US"));
-        String sdate = sdf.format(note.getUpdated_at());
-        date.setText(sdate);
-
-      }
-      @Override
-      public void onFailure(Call<Note> call, Throwable t) {
-
-      }
-    });
-
-  }
-
-
-
-
 }

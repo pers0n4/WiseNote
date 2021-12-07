@@ -25,4 +25,33 @@
     <string name="title_activity_main2">MainActivity2</string>
     <string name="tab_text_1">Tab 1</string>
     <string name="tab_text_2">Tab 2</string>
+
+
+    <!-- 김선웅 -->
+    <string name="change">change</string>
+    <string name="nameT">Name</string>
+    <string name="passwordT">password</string>
+    <string name="emailT">Email</string>
+    <string name="phoneT">phone</string>
+    <string name="logoutB">logout</string>
+    <string name="deleteB">Delete my account</string>
+    <string name="name">김선웅</string>
+    <string name="My_password">password</string>
+    <string name="email">tkfdkskarl56@naver.com</string>
+    <string name="phone">010-8921-8709</string>
+    <string name="move2">move2</string>
+    <string name="edit">EDIT</string>
+    <string name="note_title">note_title</string>
+    <string name="note_date">date</string>
+    <string name="note_category">category</string>
+    <string name="note_main_toggle">Main</string>
+    <string name="note_text_toggle">Text</string>
+    <string name="note_memo_toggle">Memo</string>
+    <string name="note_summary">Summary</string>
+    <string name="note_summary_text">EDIT</string>
+    <string name="note_voca">Voca</string>
+    <string name='record_title'>Write file name \nand select group</string>
+    <string name="record_ok"><u>OK</u></string>
+
+
 </resources>
