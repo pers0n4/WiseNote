@@ -51,6 +51,7 @@ public class HomeActivity extends AppCompatActivity {
   private Dialog addDialog;
   private Dialog deleteDialog;
   private EditText folderName;
+  private DrawerLayout drawerLayout;
 
   private final String[] titles = new String[]{"Favorite", "Recent", "Map"};
   private String token;
@@ -162,7 +163,7 @@ public class HomeActivity extends AppCompatActivity {
   // Hamburger Menu 나오기
   @SuppressLint("RtlHardcoded")
   private final View.OnClickListener hamburgerMenu = view -> {
-    DrawerLayout drawerLayout = findViewById(R.id.home_draw);
+    drawerLayout = findViewById(R.id.home_draw);
     if (!drawerLayout.isDrawerOpen(Gravity.LEFT)) {
       getData(token);
       drawerLayout.openDrawer(Gravity.LEFT);
@@ -185,7 +186,7 @@ public class HomeActivity extends AppCompatActivity {
   // Folder Item Long Click Event
   private final AdapterView.OnItemLongClickListener folderItemLongClickEvent = (adapterView, view, i, l) -> {
     deleteDialog(i,token);
-    return false;
+    return true;
   };
 
   // 폴더 추가
@@ -224,6 +225,7 @@ public class HomeActivity extends AppCompatActivity {
       deleteDialog.dismiss();
       getData(auth_token);
       adapter.notifyDataSetChanged();
+      drawerLayout.closeDrawer(Gravity.LEFT);
     });
   }
 

@@ -44,7 +44,7 @@
         <activity android:name=".ui.mypage.MyPageActivity"/>
         <activity android:name=".ui.record.RecordActivity"/>
         <activity android:name=".ui.notelist.NoteListActivity" />
-        <activity android:name=".ui.memo.MemoActivity"/>
+        <activity android:name=".ui.memo.MemoActivity" android:windowSoftInputMode="adjustPan"/>
     </application>
     <queries>
         <intent>

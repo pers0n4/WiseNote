@@ -12,12 +12,17 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -28,9 +33,13 @@ import androidx.viewpager2.widget.ViewPager2;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import kr.ac.deu.se.wisenote.R;
+import kr.ac.deu.se.wisenote.service.NoteService;
 import kr.ac.deu.se.wisenote.service.NotebookService;
 import kr.ac.deu.se.wisenote.service.ServiceGenerator;
 import kr.ac.deu.se.wisenote.ui.hamburger.HamburgerListAdapter;
@@ -39,6 +48,7 @@ import kr.ac.deu.se.wisenote.ui.home.ViewPagerAdapter;
 import kr.ac.deu.se.wisenote.ui.mypage.MyPageActivity;
 import kr.ac.deu.se.wisenote.ui.notelist.NoteListActivity;
 import kr.ac.deu.se.wisenote.ui.record.RecordActivity;
+import kr.ac.deu.se.wisenote.vo.note.Note;
 import kr.ac.deu.se.wisenote.vo.notebooks.Notebook;
 import kr.ac.deu.se.wisenote.vo.notebooks.NotebookRequest;
 import retrofit2.Call;
@@ -48,11 +58,22 @@ import retrofit2.Response;
 public class MemoActivity extends AppCompatActivity {
   private ListView listView;
   private List<Notebook> notebooks;
+  private TextView title;
+  private TextView date;
+  private LinearLayout setMemo;
+  private Note note;
   private NotebookService service;
   private HamburgerListAdapter adapter;
+  private NoteService noteService;
+  private Button edit;
   private Dialog addDialog;
   private Dialog deleteDialog;
+  private Dialog editDialog;
+  private Button ok;
   private EditText folderName;
+  private EditText editTitle;
+  private DrawerLayout drawerLayout;
+  private Spinner spinner;
 
   private final String[] titles = new String[]{"Main","Text","Memo"};
   private String token;
@@ -66,6 +87,9 @@ public class MemoActivity extends AppCompatActivity {
     SharedPreferences sharedPref = getSharedPreferences("wisenote", Context.MODE_PRIVATE);
     token = sharedPref.getString("token", null);
 
+    Intent intent = getIntent();
+    String noteId = intent.getStringExtra("NoteId");
+
     // 하단 navigation button 구현
     ImageButton home_button = findViewById(R.id.home_button);
     home_button.setOnClickListener(homeClickListener);
@@ -77,9 +101,9 @@ public class MemoActivity extends AppCompatActivity {
     ViewPager2 viewPager = findViewById(R.id.view_pager_memo);
     viewPager.setOffscreenPageLimit(3);
 
-    Fragment memoFragment = new MemoFragment();
-    Fragment textFragment = new TextFragment();
-    Fragment mainFragment = new MainFragment();
+    Fragment memoFragment = new MemoFragment(noteId,token);
+    Fragment textFragment = new TextFragment(noteId,token);
+    Fragment mainFragment = new MainFragment(noteId,token);
 
     ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(this);
     viewPagerAdapter.addFragment(mainFragment);
@@ -95,12 +119,22 @@ public class MemoActivity extends AppCompatActivity {
     listView = findViewById(R.id.listview);
     getData(token);
 
+    noteService = ServiceGenerator.createService(NoteService.class,token);
+
+    getNote(noteId);
+
     addDialog = new Dialog(MemoActivity.this);
     addDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
     addDialog.setContentView(R.layout.hamburger_add_dialog);
     deleteDialog = new Dialog(MemoActivity.this);
     deleteDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
     deleteDialog.setContentView(R.layout.hamburger_delete_dialog);
+    editDialog = new Dialog(MemoActivity.this);
+    editDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+    editDialog.setContentView(R.layout.memo_edit_dialog);
+
+    editTitle = (EditText) editDialog.findViewById(R.id.editNoteTitle);
+    spinner = (Spinner) editDialog.findViewById(R.id.spinner);
 
     //햄버거메뉴 나오기
     ImageButton hamburger = findViewById(R.id.hamButton);
@@ -120,6 +154,71 @@ public class MemoActivity extends AppCompatActivity {
 
     LinearLayout favorite = findViewById(R.id.favorite);
     favorite.setOnClickListener(favoriteNoteListClickListener);
+
+    setMemo = (LinearLayout) findViewById(R.id.setMemo);
+    setMemo.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        EditText memo = (EditText) findViewById(R.id.memo);
+        //키보드 내리기
+        InputMethodManager manager = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
+        if(manager.isAcceptingText()){
+          manager.hideSoftInputFromWindow(memo.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+        }
+        memo.clearFocus();
+        String text = memo.getText().toString();
+        note.setMemo(text);
+        Log.d("text",text);
+        noteService.setNote(noteId,note).enqueue(new Callback<Note>() {
+          @Override
+          public void onResponse(Call<Note> call, Response<Note> response) {
+            Log.d("text","code"+ response.code());
+            note = response.body();
+
+          }
+
+          @Override
+          public void onFailure(Call<Note> call, Throwable t) {
+
+          }
+        });
+      }
+    });
+    edit = (Button) findViewById(R.id.edit);
+    edit.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        editDialog(noteId);
+
+      }
+    });
+    ok = (Button)editDialog.findViewById(R.id.ok);
+    ok.setOnClickListener(new View.OnClickListener() {
+      String folderId;
+      Notebook notebook = new Notebook();
+      @Override
+      public void onClick(View view) {
+        notebook = (Notebook) spinner.getSelectedItem();
+        folderId = notebook.getId();
+        note.setTitle(editTitle.getText().toString());
+        note.setNotebook(folderId);
+        Log.d("editFolder","folder id"+ folderId);
+        noteService.setNote(noteId,note).enqueue(new Callback<Note>() {
+          @Override
+          public void onResponse(Call<Note> call, Response<Note> response) {
+            note = response.body();
+            Log.d("editNote","title  :  "+note.getTitle()+"  folderId : "+note.getNotebook_id()+"code:"+response.code());
+            getNote(noteId);
+          }
+
+          @Override
+          public void onFailure(Call<Note> call, Throwable t) {
+
+          }
+        });
+        editDialog.dismiss();
+      }
+    });
 
   }
 
@@ -159,7 +258,7 @@ public class MemoActivity extends AppCompatActivity {
   // Hamburger Menu 나오기
   @SuppressLint("RtlHardcoded")
   private final View.OnClickListener hamburgerMenu = view -> {
-    DrawerLayout drawerLayout = findViewById(R.id.memo_draw);
+    drawerLayout = findViewById(R.id.memo_draw);
     if (!drawerLayout.isDrawerOpen(Gravity.LEFT)) {
       getData(token);
       drawerLayout.openDrawer(Gravity.LEFT);
@@ -220,7 +319,15 @@ public class MemoActivity extends AppCompatActivity {
       adapter.remove(i);
       deleteDialog.dismiss();
       getData(auth_token);
+      drawerLayout.closeDrawer(Gravity.LEFT);
     });
+  }
+  public void editDialog(String noteid){
+    editDialog.show();
+    editDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+    editTitle.setText(note.getTitle());
+    MemoSpinnerAdapter memoAdapter = new MemoSpinnerAdapter(notebooks);
+    spinner.setAdapter(memoAdapter);
   }
   // 햄버거메뉴 폴더 리스트 가져오기
   public void getData(String token) {
@@ -238,5 +345,31 @@ public class MemoActivity extends AppCompatActivity {
       }
     });
   }
+  public void getNote(String noteId){
+    noteService.getNote(noteId).enqueue(new Callback<Note>() {
+      @Override
+      public void onResponse(Call<Note> call, Response<Note> response) {
+        note = response.body();
+        Log.d("note","note title:"+note.getTitle());
+        Log.d("note","note title:"+note.getUpdated_at());
+        title = (TextView) findViewById(R.id.textView15);
+        title.setText(note.getTitle());
+
+        date = (TextView) findViewById(R.id.textView16);
+        SimpleDateFormat sdf = new SimpleDateFormat("E, MMM dd, y",new Locale("en", "US"));
+        String sdate = sdf.format(note.getUpdated_at());
+        date.setText(sdate);
+
+      }
+      @Override
+      public void onFailure(Call<Note> call, Throwable t) {
+
+      }
+    });
+
+  }
+
+
+
 
 }

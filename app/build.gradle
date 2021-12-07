@@ -63,3 +63,4 @@ dependencies {
 
     implementation 'gun0912.ted:tedpermission:2.2.0'
 }
+

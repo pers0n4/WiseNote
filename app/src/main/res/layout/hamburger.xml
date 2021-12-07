@@ -86,19 +86,24 @@
                 android:id="@+id/textView10"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
+                android:layout_gravity="center|left"
                 android:fontFamily="@font/bahnschrift"
                 android:text="Folders"
                 android:textColor="#777777"
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
+            <View
+                android:id="@+id/view"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
             <ImageButton
                 android:id="@+id/addFolder"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginLeft="90dp"
+                android:layout_gravity="center|right"
                 android:background="#00ff0000"
                 app:srcCompat="@drawable/icon_add"
                 tools:ignore="TouchTargetSizeCheck" />
