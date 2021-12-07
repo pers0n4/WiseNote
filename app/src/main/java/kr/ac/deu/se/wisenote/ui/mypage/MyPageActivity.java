@@ -24,7 +24,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MyPageActivity extends AppCompatActivity {
   TokenGet tokenGetreulst;
-  String id;
+  String token;
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -37,7 +37,7 @@ public class MyPageActivity extends AppCompatActivity {
     TextView textView5 =(TextView)findViewById(R.id.NId);
 
     Intent intent = getIntent();
-    id=intent.getStringExtra("아이디");
+    token=intent.getStringExtra("token");
 
     Retrofit retrofit = new Retrofit.Builder()
       .baseUrl("http://13.125.179.157/")
@@ -45,8 +45,7 @@ public class MyPageActivity extends AppCompatActivity {
       .build();
 
     RetrofitService retrofitService = retrofit.create(RetrofitService.class);
-    Call<TokenGet> tokenGetCall = retrofitService.TestToken("Bearer "+id);
-    Log.d("zz","auth: 실패, 결과\n"+ id);
+    Call<TokenGet> tokenGetCall = retrofitService.TestToken("Bearer "+token);
     tokenGetCall.enqueue(new Callback<TokenGet>() {
       @Override
       public void onResponse(Call<TokenGet> call, Response<TokenGet> response) {
@@ -101,8 +100,8 @@ public class MyPageActivity extends AppCompatActivity {
       .addConverterFactory(GsonConverterFactory.create())
       .build();
     RetrofitService service = retrofit.create(RetrofitService.class);
-    Log.d("hiqq","delete: 실패, 결과\n"+id+" "+tokenGetreulst.getId());
-    Call<Void> call2 = service.deleteToken("Bearer "+id,tokenGetreulst.getId());
+    Log.d("hiqq","delete: 실패, 결과\n"+token+" "+tokenGetreulst.getId());
+    Call<Void> call2 = service.deleteToken("Bearer "+token,tokenGetreulst.getId());
     call2.enqueue(new Callback<Void>() {
       @Override
       public void onResponse(Call<Void> call2, Response<Void> response) {

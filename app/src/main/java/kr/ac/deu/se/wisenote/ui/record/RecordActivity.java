@@ -69,7 +69,7 @@ public class RecordActivity extends AppCompatActivity {
   boolean i = true;
   long TimeStop;
   Dialog dialog;
-  String id, tv, sp;
+  String token, tv, sp;
   double longitude, latitude;
   FusedLocationProviderClient fusedLocationClient;
   LocationListener locationListener;
@@ -113,17 +113,17 @@ public class RecordActivity extends AppCompatActivity {
           .build();
         RetrofitService service = retrofit.create(RetrofitService.class);
         NotePost notePost = new NotePost(tv, sp, "string", true, "string", 0, 0);
-        Call<NoteCreateResponse> call = service.createNote("Bearer " + id, notePost);
+        Call<NoteCreateResponse> call = service.createNote("Bearer " + token, notePost);
         call.enqueue(new Callback<NoteCreateResponse>() {
           @Override
           public void onResponse(Call<NoteCreateResponse> call, Response<NoteCreateResponse> response) {
-            Log.d("asdf", "auth: 성공\n" + id + " " + tv + " " + sp);
+            Log.d("asdf", "auth: 성공\n" + token + " " + tv + " " + sp);
             dialog.dismiss();
           }
 
           @Override
           public void onFailure(Call<NoteCreateResponse> call, Throwable t) {
-            Log.d("asdf", "auth: 실패\n" + id);
+            Log.d("asdf", "auth: 실패\n" + token);
           }
         });
       }
@@ -173,7 +173,7 @@ public class RecordActivity extends AppCompatActivity {
 
     fusedLocationClient = LocationServices.getFusedLocationProviderClient(RecordActivity.this);
     Intent intent = getIntent();
-    id = intent.getStringExtra("아이디");
+    token = intent.getStringExtra("token");
     dialog = new Dialog(RecordActivity.this);       // Dialog 초기화
     dialog.requestWindowFeature(Window.FEATURE_NO_TITLE); // 타이틀 제거
     dialog.setContentView(R.layout.recording_create);

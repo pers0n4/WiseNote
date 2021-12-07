@@ -1,6 +1,5 @@
 package kr.ac.deu.se.wisenote.ui.home;
 
-import android.content.Intent;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Context;
@@ -9,7 +8,6 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.view.View;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -34,11 +32,11 @@ import com.google.android.material.tabs.TabLayoutMediator;
 import java.util.List;
 
 import kr.ac.deu.se.wisenote.R;
-import kr.ac.deu.se.wisenote.ui.record.RecordActivity;
 import kr.ac.deu.se.wisenote.service.NotebookService;
 import kr.ac.deu.se.wisenote.service.ServiceGenerator;
 import kr.ac.deu.se.wisenote.ui.hamburger.HamburgerListAdapter;
 import kr.ac.deu.se.wisenote.ui.notelist.NoteListActivity;
+import kr.ac.deu.se.wisenote.ui.record.RecordActivity;
 import kr.ac.deu.se.wisenote.vo.notebooks.Notebook;
 import kr.ac.deu.se.wisenote.vo.notebooks.NotebookRequest;
 import retrofit2.Call;
@@ -71,6 +69,8 @@ public class HomeActivity extends AppCompatActivity {
     home_button.setOnClickListener(homeClickListener);
     ImageButton my_page_button = findViewById(R.id.mypage_button);
     my_page_button.setOnClickListener(myPageClickListener);
+    ImageButton record_button = findViewById(R.id.Record_btn);
+    record_button.setOnClickListener(recordClickListener);
 
     // 탭 뷰 옆 모든 노트 목록 확인 버튼
     TextView tv_notelist = findViewById(R.id.note_list_button);
@@ -148,7 +148,14 @@ public class HomeActivity extends AppCompatActivity {
 
   // Bottom Menu My Page Button Click Event
   private final View.OnClickListener myPageClickListener = view -> {
-    Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
+    Intent intent = new Intent(kr.ac.deu.se.wisenote.ui.home.HomeActivity.this, kr.ac.deu.se.wisenote.ui.mypage.MyPageActivity.class);
+    intent.putExtra("token",token);
+    startActivity(intent);
+  };
+  // Bottom Menu record Button Click Event
+  private final View.OnClickListener recordClickListener = view -> {
+    Intent intent = new Intent(kr.ac.deu.se.wisenote.ui.home.HomeActivity.this, RecordActivity.class);
+    intent.putExtra("token",token);
     startActivity(intent);
   };
 
@@ -233,26 +240,6 @@ public class HomeActivity extends AppCompatActivity {
       @Override
       public void onFailure(Call<List<Notebook>> call, Throwable t) {
 
-      }
-    });
-
-    Intent intent = getIntent();
-    id=intent.getStringExtra("아이디");
-
-    findViewById(R.id.MyPage_btn).setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        Intent intent = new Intent(kr.ac.deu.se.wisenote.ui.home.HomeActivity.this, kr.ac.deu.se.wisenote.ui.mypage.MyPageActivity.class);
-        intent.putExtra("아이디",id);
-        startActivity(intent);
-      }
-    });
-    findViewById(R.id.Record_btn).setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        Intent intent = new Intent(kr.ac.deu.se.wisenote.ui.home.HomeActivity.this, RecordActivity.class);
-        intent.putExtra("아이디",id);
-        startActivity(intent);
       }
     });
   }
