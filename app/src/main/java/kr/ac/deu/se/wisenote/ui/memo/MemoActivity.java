@@ -72,7 +72,7 @@ public class MemoActivity extends AppCompatActivity {
   private Button ok;
   private EditText folderName;
   private EditText editTitle;
-
+  private DrawerLayout drawerLayout;
   private Spinner spinner;
 
   private final String[] titles = new String[]{"Main","Text","Memo"};
@@ -258,7 +258,7 @@ public class MemoActivity extends AppCompatActivity {
   // Hamburger Menu 나오기
   @SuppressLint("RtlHardcoded")
   private final View.OnClickListener hamburgerMenu = view -> {
-    DrawerLayout drawerLayout = findViewById(R.id.memo_draw);
+    drawerLayout = findViewById(R.id.memo_draw);
     if (!drawerLayout.isDrawerOpen(Gravity.LEFT)) {
       getData(token);
       drawerLayout.openDrawer(Gravity.LEFT);
@@ -319,6 +319,7 @@ public class MemoActivity extends AppCompatActivity {
       adapter.remove(i);
       deleteDialog.dismiss();
       getData(auth_token);
+      drawerLayout.closeDrawer(Gravity.LEFT);
     });
   }
   public void editDialog(String noteid){
