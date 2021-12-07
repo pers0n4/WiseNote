@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -14,6 +15,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import kr.ac.deu.se.wisenote.R;
 import kr.ac.deu.se.wisenote.service.RetrofitService;
+import kr.ac.deu.se.wisenote.ui.home.HomeActivity;
+import kr.ac.deu.se.wisenote.ui.record.RecordActivity;
 import kr.ac.deu.se.wisenote.vo.token.TokenGet;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -35,6 +38,14 @@ public class MyPageActivity extends AppCompatActivity {
     TextView textView3 =(TextView)findViewById(R.id.EmailId);
     TextView textView4 =(TextView)findViewById(R.id.PhoneId);
     TextView textView5 =(TextView)findViewById(R.id.NId);
+
+    // 하단 navigation button 구현
+    ImageButton home_button = findViewById(R.id.home_button);
+    home_button.setOnClickListener(homeClickListener);
+    ImageButton my_page_button = findViewById(R.id.mypage_button);
+    my_page_button.setOnClickListener(myPageClickListener);
+    ImageButton record_button = findViewById(R.id.Record_btn);
+    record_button.setOnClickListener(recordClickListener);
 
     Intent intent = getIntent();
     token=intent.getStringExtra("token");
@@ -213,5 +224,23 @@ public class MyPageActivity extends AppCompatActivity {
     ad.show();
   }
 
+  // Bottom Menu Home Button Click Event
+  private final View.OnClickListener homeClickListener = view -> {
+    Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
+    startActivity(intent);
+  };
 
+  // Bottom Menu My Page Button Click Event
+  private final View.OnClickListener myPageClickListener = view -> {
+    Intent intent = new Intent(getApplicationContext(), MyPageActivity.class);
+    intent.putExtra("token",token);
+    startActivity(intent);
+  };
+
+  // Bottom Menu record Button Click Event
+  private final View.OnClickListener recordClickListener = view -> {
+    Intent intent = new Intent(getApplicationContext(), RecordActivity.class);
+    intent.putExtra("token",token);
+    startActivity(intent);
+  };
 }

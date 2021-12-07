@@ -35,6 +35,8 @@ import kr.ac.deu.se.wisenote.service.ServiceGenerator;
 import kr.ac.deu.se.wisenote.ui.hamburger.HamburgerListAdapter;
 import kr.ac.deu.se.wisenote.ui.home.HomeActivity;
 import kr.ac.deu.se.wisenote.ui.memo.MemoActivity;
+import kr.ac.deu.se.wisenote.ui.mypage.MyPageActivity;
+import kr.ac.deu.se.wisenote.ui.record.RecordActivity;
 import kr.ac.deu.se.wisenote.vo.note.Note;
 import kr.ac.deu.se.wisenote.vo.notebooks.Notebook;
 import kr.ac.deu.se.wisenote.vo.notebooks.NotebookRequest;
@@ -71,6 +73,8 @@ public class NoteListActivity extends AppCompatActivity {
     home_button.setOnClickListener(homeClickListener);
     ImageButton my_page_button = findViewById(R.id.mypage_button);
     my_page_button.setOnClickListener(myPageClickListener);
+    ImageButton record_button = findViewById(R.id.Record_btn);
+    record_button.setOnClickListener(recordClickListener);
 
     tv_title = findViewById(R.id.notebook_title);
     tv_description = findViewById(R.id.notebook_description);
@@ -236,10 +240,19 @@ public class NoteListActivity extends AppCompatActivity {
   };
 
   // Bottom Menu My Page Button Click Event
-  private View.OnClickListener myPageClickListener = view -> {
-    Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
+  private final View.OnClickListener myPageClickListener = view -> {
+    Intent intent = new Intent(getApplicationContext(), MyPageActivity.class);
+    intent.putExtra("token",token);
     startActivity(intent);
   };
+
+  // Bottom Menu record Button Click Event
+  private final View.OnClickListener recordClickListener = view -> {
+    Intent intent = new Intent(getApplicationContext(), RecordActivity.class);
+    intent.putExtra("token",token);
+    startActivity(intent);
+  };
+
 
   // Hamburger Menu 나오기
   @SuppressLint("RtlHardcoded")
