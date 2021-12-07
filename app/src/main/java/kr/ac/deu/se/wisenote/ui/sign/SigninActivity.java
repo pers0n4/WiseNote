@@ -77,6 +77,5 @@ public class SigninActivity extends AppCompatActivity{
         t.printStackTrace();
       }
     });
-
   }
 }

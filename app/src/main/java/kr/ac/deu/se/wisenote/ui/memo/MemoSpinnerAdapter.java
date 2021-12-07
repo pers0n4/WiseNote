@@ -48,10 +48,7 @@ public class MemoSpinnerAdapter extends BaseAdapter {
       LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
       view = inflater.inflate(R.layout.spinner_list_item, viewGroup,false);
     }
-
-
       TextView title = (TextView)view.findViewById(R.id.textView21);
-
       title.setText(lists.get(i).getName());
 
     return view;
@@ -65,12 +62,8 @@ public class MemoSpinnerAdapter extends BaseAdapter {
       convertView = inflater.inflate(R.layout.spinner_dropdown_item,parent,false);
     }
 
-
     TextView title = (TextView)convertView.findViewById(R.id.textView22);
-
     title.setText(lists.get(position).getName());
-
-
     return convertView;
   }
 
