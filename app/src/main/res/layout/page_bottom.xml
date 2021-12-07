@@ -15,20 +15,22 @@
         android:contentDescription="@string/home_icon_description" />
 
     <ImageButton
+        android:id="@+id/Record_btn"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_weight="1"
-        android:src="@drawable/icon_plus_circle"
         android:backgroundTint="#FFFFFF"
-        android:contentDescription="test" />
+        android:contentDescription="test"
+        android:src="@drawable/icon_plus_circle" />
 
     <ImageButton
+        android:id="@+id/MyPage_btn"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:layout_weight="1"
         android:layout_marginRight="20dp"
-        android:src="@drawable/icon_person"
+        android:layout_weight="1"
         android:backgroundTint="#FFFFFF"
-        android:contentDescription="@string/person_icon_description" />
+        android:contentDescription="@string/person_icon_description"
+        android:src="@drawable/icon_person" />
 
 </LinearLayout>

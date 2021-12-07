@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-import kr.ac.deu.se.wisenote.vo.note.Note;
+import kr.ac.deu.se.wisenote.vo.note.NotePost;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -21,5 +21,5 @@ public class Notebook {
   private String user_id;
 
   @SerializedName("notes")
-  private List<Note> notes = null;
+  private List<NotePost> notes = null;
 }
